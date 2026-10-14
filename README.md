@@ -12,9 +12,9 @@ BTTH2 tập trung vào phân tích thành phần tri thức, xác định quan h
 
 | Họ tên | MSSV | Trách nhiệm chính |
 |---|---|---|
-| Võ Hoài Chiều | 24520220 | Phân tích Concepts, Attributes, Facts; chuẩn hóa tri thức thực phẩm, nhóm thực phẩm, thành phần dinh dưỡng và dữ liệu mẫu. |
-| Đoàn Hữu Gia Bình | 24520192 | Phân tích Relations, xác định ràng buộc, xây dựng sơ đồ tri thức tổng thể và tích hợp báo cáo. |
-| Nguyễn Thái Bảo | 24520173 | Thiết kế mô hình biểu diễn tri thức, Rules IF–THEN, điều kiện và kết luận suy luận. |
+| Đoàn Hữu Gia Bình | 24520192 | Phân tích Concepts, Attributes, Facts; chuẩn hóa tri thức thực phẩm, nhóm thực phẩm, thành phần dinh dưỡng và dữ liệu mẫu. |
+| Nguyễn Thái Bảo | 24520173 | Phân tích Relations, xác định ràng buộc, xây dựng sơ đồ tri thức tổng thể và tích hợp báo cáo. |
+| Võ Hoài Chiều | 24520220 | Thiết kế mô hình biểu diễn tri thức, Rules IF–THEN, điều kiện và kết luận suy luận. |
 | Bùi Huy Chương | 24520230 | Tổ chức cơ sở tri thức trên máy, xây dựng chương trình Python đọc/kiểm tra/truy vấn tri thức, kiểm thử và đóng gói. |
 
 ## 3. Mô hình biểu diễn tri thức
@@ -62,14 +62,14 @@ Các chức năng trong bảng là kế hoạch triển khai. Bốn file JSON hi
 
 | Đường dẫn | Chức năng dự kiến | Thành viên phụ trách | Trạng thái |
 |---|---|---|---|
-| `kb/concepts.json` | Lưu Concepts và Attributes: tên, thuộc tính, kiểu dữ liệu và cấu trúc biểu diễn. | Võ Hoài Chiều | Placeholder – Chưa triển khai |
-| `kb/facts.json` | Lưu thực thể và dữ kiện về thực phẩm, dinh dưỡng, người dùng, món ăn và quan hệ đã biết. | Võ Hoài Chiều; phối hợp các thành viên liên quan | Placeholder – Chưa triển khai |
-| `kb/relations.json` | Lưu Relations, miền xác định, miền giá trị và ràng buộc. | Đoàn Hữu Gia Bình | Placeholder – Chưa triển khai |
-| `kb/rules.json` | Lưu luật IF–THEN, điều kiện, kết luận và mức độ ưu tiên. | Nguyễn Thái Bảo | Placeholder – Chưa triển khai |
-| `docs/concepts.md` | Bảng phân tích khái niệm, thuộc tính và nguồn tri thức. | Võ Hoài Chiều | Placeholder – Chưa triển khai |
-| `docs/relations.md` | Bảng quan hệ, cú pháp, ý nghĩa, tính chất và ràng buộc; bổ sung sơ đồ tri thức sau. | Đoàn Hữu Gia Bình | Placeholder – Chưa triển khai |
-| `docs/rules.md` | Bảng đặc tả mã luật, nội dung, tiền đề, kết luận, Concepts và Relations liên quan. | Nguyễn Thái Bảo | Placeholder – Chưa triển khai |
+| `kb/concepts.json` | Lưu Concepts và Attributes: tên, thuộc tính, kiểu dữ liệu và cấu trúc biểu diễn. | Đoàn Hữu Gia Bình | Placeholder – Chưa triển khai |
+| `kb/facts.json` | Lưu thực thể và dữ kiện về thực phẩm, dinh dưỡng, người dùng, món ăn và quan hệ đã biết. | Đoàn Hữu Gia Bình; phối hợp các thành viên liên quan | Placeholder – Chưa triển khai |
+| `kb/relations.json` | Lưu Relations, miền xác định, miền giá trị và ràng buộc. | Nguyễn Thái Bảo | Placeholder – Chưa triển khai |
+| `kb/rules.json` | Lưu luật IF–THEN, điều kiện, kết luận và mức độ ưu tiên. | Võ Hoài Chiều | Placeholder – Chưa triển khai |
+| `docs/concepts.md` | Bảng phân tích khái niệm, thuộc tính và nguồn tri thức. | Đoàn Hữu Gia Bình | Placeholder – Chưa triển khai |
+| `docs/relations.md` | Bảng quan hệ, cú pháp, ý nghĩa, tính chất và ràng buộc; bổ sung sơ đồ tri thức sau. | Nguyễn Thái Bảo | Placeholder – Chưa triển khai |
+| `docs/rules.md` | Bảng đặc tả mã luật, nội dung, tiền đề, kết luận, Concepts và Relations liên quan. | Võ Hoài Chiều | Placeholder – Chưa triển khai |
 | `src/validate_kb.py` | Kiểm tra định dạng JSON, cấu trúc dữ liệu và tính nhất quán của tham chiếu. | Bùi Huy Chương | Placeholder – Chưa triển khai |
-| `src/demo_queries.py` | Nạp cơ sở tri thức, truy vấn và minh họa suy luận. | Bùi Huy Chương; phối hợp Nguyễn Thái Bảo | Placeholder – Chưa triển khai |
+| `src/demo_queries.py` | Nạp cơ sở tri thức, truy vấn và minh họa suy luận. | Bùi Huy Chương; phối hợp Võ Hoài Chiều | Placeholder – Chưa triển khai |
 | `tests/test_cases.md` | Đặc tả tình huống kiểm thử, đầu vào, kết quả mong đợi và kết quả thực tế. | Bùi Huy Chương | Placeholder – Chưa triển khai |
-| `README.md` | Giới thiệu repository, nhóm, mô hình, cấu trúc và phân công công việc. | Cả nhóm; Đoàn Hữu Gia Bình tích hợp báo cáo | Đã hoàn thiện tài liệu khởi tạo |
+| `README.md` | Giới thiệu repository, nhóm, mô hình, cấu trúc và phân công công việc. | Cả nhóm; Nguyễn Thái Bảo tích hợp báo cáo | Đã hoàn thiện tài liệu khởi tạo |
