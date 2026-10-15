@@ -1,1 +1,187 @@
-{}
+{
+  "concepts": [
+    {
+      "id": "food",
+      "display_name": "Food",
+      "description": "Thực phẩm hoặc nguyên liệu, phân biệt theo trạng thái bản ghi.",
+      "syntax": "food(id)",
+      "notation": "food(food_rice_cooked)",
+      "attributes": [
+        {"name": "id", "type": "string", "required": true},
+        {"name": "name", "type": "string", "required": true},
+        {"name": "food_state", "type": "string", "required": true},
+        {"name": "origin", "type": "string", "required": true, "enum": ["plant", "dairy", "egg", "meat", "seafood", "unknown"]},
+        {"name": "allergen_status", "type": "string", "required": true, "enum": ["complete", "unknown"]},
+        {"name": "diet_status", "type": "string", "required": true, "enum": ["complete", "unknown"]}
+      ],
+      "example_id": "food_rice_cooked",
+      "related_rule_ids": ["R01", "R02", "R03", "R04", "R05", "R06", "R07", "R08", "R09", "R10"],
+      "_meta": {
+        "source_ids": ["source_th1", "source_th2", "source_design"]
+      }
+    },
+    {
+      "id": "food_group",
+      "display_name": "FoodGroup",
+      "description": "Nhóm phân loại chính do bài thiết kế; không phải ngưỡng giàu chất.",
+      "syntax": "food_group(id)",
+      "notation": "food_group(group_starch)",
+      "attributes": [
+        {"name": "id", "type": "string", "required": true},
+        {"name": "name", "type": "string", "required": true},
+        {"name": "criterion", "type": "string", "required": true}
+      ],
+      "example_id": "group_starch",
+      "related_rule_ids": [],
+      "_meta": {
+        "source_ids": ["source_th1", "source_th2", "source_design"]
+      }
+    },
+    {
+      "id": "nutrient",
+      "display_name": "Nutrient",
+      "description": "Đại lượng dinh dưỡng; năng lượng được đưa chung vào danh mục theo yêu cầu.",
+      "syntax": "nutrient(id)",
+      "notation": "nutrient(nutrient_protein)",
+      "attributes": [
+        {"name": "id", "type": "string", "required": true},
+        {"name": "name", "type": "string", "required": true},
+        {"name": "unit", "type": "string", "required": true, "enum": ["kcal", "g", "mg"]},
+        {"name": "usda_nutrient_id", "type": "integer", "required": true, "minimum": 1}
+      ],
+      "example_id": "nutrient_protein",
+      "related_rule_ids": ["R06", "R07", "R08"],
+      "_meta": {
+        "source_ids": ["source_th1", "source_th2", "source_design"]
+      }
+    },
+    {
+      "id": "nutrient_content",
+      "display_name": "NutrientContent",
+      "description": "Bản ghi hàm lượng của một food và một nutrient.",
+      "syntax": "nutrient_content(id)",
+      "notation": "nutrient_content(nc_rice_cooked_protein)",
+      "attributes": [
+        {"name": "id", "type": "string", "required": true},
+        {"name": "value", "type": ["number", "null"], "required": true, "minimum": 0},
+        {"name": "basis_g", "type": "number", "required": true, "const": 100, "unit": "g"},
+        {"name": "status", "type": "string", "required": true, "enum": ["known", "unknown"]},
+        {"name": "source_id", "type": "string", "required": true},
+        {"name": "source_record_id", "type": ["string", "null"], "required": true}
+      ],
+      "example_id": "nc_rice_cooked_protein",
+      "related_rule_ids": ["R05", "R06", "R07", "R08"],
+      "_meta": {
+        "source_ids": ["source_th1", "source_th2", "source_design"]
+      }
+    },
+    {
+      "id": "allergen",
+      "display_name": "Allergen",
+      "description": "Tác nhân dị ứng trong danh mục 5 của bài.",
+      "syntax": "allergen(id)",
+      "notation": "allergen(allergen_milk)",
+      "attributes": [
+        {"name": "id", "type": "string", "required": true},
+        {"name": "name", "type": "string", "required": true},
+        {"name": "description", "type": "string", "required": true}
+      ],
+      "example_id": "allergen_milk",
+      "related_rule_ids": ["R01"],
+      "_meta": {
+        "source_ids": ["source_th1", "source_th2", "source_design"]
+      }
+    },
+    {
+      "id": "dish",
+      "display_name": "Dish",
+      "description": "Công thức phối hợp các nguyên liệu đã ở đúng trạng thái trong Food.",
+      "syntax": "dish(id)",
+      "notation": "dish(dish_rice_chicken)",
+      "attributes": [
+        {"name": "id", "type": "string", "required": true},
+        {"name": "name", "type": "string", "required": true},
+        {"name": "servings", "type": "integer", "required": true, "minimum": 1},
+        {"name": "recipe_status", "type": "string", "required": true, "enum": ["complete", "unknown"]}
+      ],
+      "example_id": "dish_rice_chicken",
+      "related_rule_ids": ["R02", "R05", "R06", "R07", "R08", "R09", "R10"],
+      "_meta": {
+        "source_ids": ["source_th1", "source_th2", "source_design"]
+      }
+    },
+    {
+      "id": "meal",
+      "display_name": "Meal",
+      "description": "Bữa ăn cụ thể; breakfast/lunch/dinner là loại, không phải ID bữa.",
+      "syntax": "meal(id)",
+      "notation": "meal(meal_ordinary_breakfast)",
+      "attributes": [
+        {"name": "id", "type": "string", "required": true},
+        {"name": "name", "type": "string", "required": true},
+        {"name": "meal_type", "type": "string", "required": true, "enum": ["breakfast", "lunch", "dinner"]}
+      ],
+      "example_id": "meal_ordinary_breakfast",
+      "related_rule_ids": ["R02", "R06", "R07", "R08", "R09", "R10"],
+      "_meta": {
+        "source_ids": ["source_th1", "source_th2", "source_design"]
+      }
+    },
+    {
+      "id": "menu",
+      "display_name": "Menu",
+      "description": "Thực đơn một ngày trong phạm vi thiết kế này.",
+      "syntax": "menu(id)",
+      "notation": "menu(menu_ordinary)",
+      "attributes": [
+        {"name": "id", "type": "string", "required": true},
+        {"name": "name", "type": "string", "required": true},
+        {"name": "scope", "type": "string", "required": true, "const": "one_day"}
+      ],
+      "example_id": "menu_ordinary",
+      "related_rule_ids": ["R02", "R06", "R07", "R08", "R09", "R10"],
+      "_meta": {
+        "source_ids": ["source_th1", "source_th2", "source_design"]
+      }
+    },
+    {
+      "id": "user_profile",
+      "display_name": "UserProfile",
+      "description": "Hồ sơ đầu vào giả lập; các khai báo không phải tri thức chuyên môn.",
+      "syntax": "user_profile(id)",
+      "notation": "user_profile(user_minh)",
+      "attributes": [
+        {"name": "id", "type": "string", "required": true},
+        {"name": "name", "type": "string", "required": true},
+        {"name": "context", "type": "object", "required": true, "properties": {"age": {"type": "integer", "minimum": 18}, "sex": {"type": "string", "enum": ["female", "male", "unspecified"]}, "activity": {"type": "string", "enum": ["low", "moderate", "high"]}}, "required_fields": ["age", "sex", "activity"]},
+        {"name": "nutrition_goal", "type": "string", "required": true, "enum": ["prefer_protein", "prefer_fiber", "prefer_calcium", "none"]},
+        {"name": "allergy_status", "type": "string", "required": true, "enum": ["complete", "unknown"]},
+        {"name": "avoid_status", "type": "string", "required": true, "enum": ["complete", "unknown"]}
+      ],
+      "example_id": "user_minh",
+      "related_rule_ids": ["R01", "R03", "R04", "R05", "R07", "R08", "R09", "R10"],
+      "_meta": {
+        "source_ids": ["source_th1", "source_th2", "source_design"]
+      }
+    },
+    {
+      "id": "diet_pattern",
+      "display_name": "DietPattern",
+      "description": "Định nghĩa chế độ ăn được chọn cho bài.",
+      "syntax": "diet_pattern(id)",
+      "notation": "diet_pattern(diet_vegan)",
+      "attributes": [
+        {"name": "id", "type": "string", "required": true},
+        {"name": "name", "type": "string", "required": true},
+        {"name": "policy_description", "type": "string", "required": true},
+        {"name": "policy_status", "type": "string", "required": true, "enum": ["complete", "unknown"]}
+      ],
+      "example_id": "diet_vegan",
+      "related_rule_ids": ["R03", "R05"],
+      "_meta": {
+        "source_ids": ["source_th1", "source_th2", "source_design"]
+      }
+    }
+  ],
+  "convention": "3-6 thuộc tính nghiệp vụ/concept; _meta là metadata dùng chung. Các liên kết nằm ở facts, không lưu ID quan hệ lặp trong thuộc tính."
+}

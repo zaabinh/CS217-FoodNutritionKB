@@ -1,1 +1,192 @@
-{}
+{
+  "representation": "declarative_specification_not_executable_python",
+  "rules": [
+    {
+      "id": "R01",
+      "name": "Loại food chứa tác nhân người dùng dị ứng",
+      "phase": "hard_constraints",
+      "priority": 100,
+      "kind": "hard",
+      "if_all": ["allergic_to(u,a)", "contains_allergen(f,a)"],
+      "then": {
+        "action": "set_status",
+        "target": "food f for user u",
+        "value": "rejected",
+        "reason": "allergen_match",
+        "trace": ["u", "a", "f"]
+      },
+      "concept_ids": ["user_profile", "food", "allergen"],
+      "relation_names": ["allergic_to", "contains_allergen"],
+      "source_ids": ["source_fda", "source_design"]
+    },
+    {
+      "id": "R02",
+      "name": "Lan truyền trạng thái qua nguyên liệu, món, bữa và thực đơn",
+      "phase": "propagation",
+      "priority": 95,
+      "kind": "hard",
+      "if_all": ["children(x) xác định bởi uses_ingredient / contains_dish / contains_meal", "Có ít nhất một child rejected hoặc requires_review"],
+      "then": {
+        "action": "aggregate_status",
+        "target": "parent x for user u",
+        "order": ["rejected", "requires_review"],
+        "trace": "Giữ child ID, đường quan hệ và rule gây trạng thái."
+      },
+      "concept_ids": ["food", "dish", "meal", "menu"],
+      "relation_names": ["uses_ingredient", "contains_dish", "contains_meal"],
+      "source_ids": ["source_th2", "source_design"]
+    },
+    {
+      "id": "R03",
+      "name": "Loại food không phù hợp chế độ ăn",
+      "phase": "hard_constraints",
+      "priority": 100,
+      "kind": "hard",
+      "if_all": ["follows_diet(u,d)", "Not(compatible_with_diet(f,d)) đã biết tường minh hoặc theo danh mục complete"],
+      "then": {
+        "action": "set_status",
+        "target": "food f for user u",
+        "value": "rejected",
+        "reason": "diet_mismatch",
+        "trace": ["u", "d", "f"]
+      },
+      "concept_ids": ["user_profile", "diet_pattern", "food"],
+      "relation_names": ["follows_diet", "compatible_with_diet"],
+      "source_ids": ["source_vegetarian", "source_vegan", "source_design"]
+    },
+    {
+      "id": "R04",
+      "name": "Loại food người dùng cần tránh",
+      "phase": "hard_constraints",
+      "priority": 100,
+      "kind": "hard",
+      "if_all": ["avoids_food(u,f)"],
+      "then": {
+        "action": "set_status",
+        "target": "food f for user u",
+        "value": "rejected",
+        "reason": "explicit_avoid",
+        "trace": ["u", "f"]
+      },
+      "concept_ids": ["user_profile", "food"],
+      "relation_names": ["avoids_food"],
+      "source_ids": ["source_th2", "source_design"]
+    },
+    {
+      "id": "R05",
+      "name": "Chặn kết luận khi thiếu dữ liệu cần thiết",
+      "phase": "hard_constraints",
+      "priority": 90,
+      "kind": "hard",
+      "then": {
+        "action": "set_status_unless_rejected",
+        "target": "affected food/dish/meal/menu for user u",
+        "value": "requires_review",
+        "reason": "missing_required_data",
+        "trace": "Liệt kê trường hoặc tham chiếu thiếu."
+      },
+      "concept_ids": ["user_profile", "food", "dish", "nutrient_content", "diet_pattern"],
+      "relation_names": ["follows_diet", "compatible_with_diet", "has_nutrient_content", "measures_nutrient", "uses_ingredient"],
+      "source_ids": ["source_th2", "source_design"],
+      "if_any": ["Thiếu khai báo dị ứng/tránh của user hoặc thiếu hồ sơ chế độ", "HOẶC food allergen_status=unknown, kết quả chế độ đang chọn unknown, recipe_status=unknown", "HOẶC hàm lượng cần cho mục tiêu hoặc định lượng thành phần chưa biết"]
+    },
+    {
+      "id": "R06",
+      "name": "Tổng hợp hàm lượng theo định lượng",
+      "phase": "aggregation",
+      "priority": 70,
+      "kind": "calculation",
+      "if_all": ["Mỗi giá trị cần dùng có status=known, basis_g=100, cùng đúng trạng thái Food", "Định lượng và servings hợp lệ"],
+      "then": {
+        "action": "calculate_nutrients",
+        "formula": "Dish.recipe_total[n] = Σ amount_g(food) × value_per_100g(food,n) / 100; Dish.per_serving = recipe_total / dish.servings; Meal = Σ meal_servings × Dish.per_serving; Menu = Σ Meal.",
+        "on_missing": "value=null và missing_inputs; không thay bằng 0"
+      },
+      "concept_ids": ["food", "nutrient", "nutrient_content", "dish", "meal", "menu"],
+      "relation_names": ["has_nutrient_content", "measures_nutrient", "uses_ingredient", "contains_dish", "contains_meal"],
+      "source_ids": ["source_usda_dictionary", "source_design"]
+    },
+    {
+      "id": "R07",
+      "name": "Ưu tiên protein theo mục tiêu",
+      "phase": "ranking",
+      "priority": 20,
+      "kind": "soft",
+      "if_all": ["u.nutrition_goal=prefer_protein", "R10 cho phép hai ứng viên cùng concept và cùng cơ sở so sánh tương ứng", "protein(x)>protein(y), các giá trị known"],
+      "then": {
+        "action": "prefer_candidate",
+        "preferred": "x",
+        "over": "y",
+        "reason": "higher_protein_at_same_basis"
+      },
+      "concept_ids": ["user_profile", "food", "dish", "meal", "menu", "nutrient", "nutrient_content"],
+      "relation_names": ["has_nutrient_content", "measures_nutrient", "uses_ingredient", "contains_dish", "contains_meal"],
+      "source_ids": ["source_th1", "source_design"]
+    },
+    {
+      "id": "R08",
+      "name": "Ưu tiên chất xơ hoặc canxi theo mục tiêu",
+      "phase": "ranking",
+      "priority": 20,
+      "kind": "soft",
+      "if_all": ["u.nutrition_goal thuộc prefer_fiber/prefer_calcium", "R10 cho phép hai ứng viên cùng cấp; metric là fiber/calcium tương ứng", "metric(x)>metric(y), các giá trị known"],
+      "then": {
+        "action": "prefer_candidate",
+        "preferred": "x",
+        "over": "y",
+        "reason": "higher_selected_nutrient_at_same_basis"
+      },
+      "concept_ids": ["user_profile", "food", "dish", "meal", "menu", "nutrient", "nutrient_content"],
+      "relation_names": ["has_nutrient_content", "measures_nutrient", "uses_ingredient", "contains_dish", "contains_meal"],
+      "source_ids": ["source_th1", "source_design"]
+    },
+    {
+      "id": "R09",
+      "name": "Xếp hạng theo sở thích sau mục tiêu",
+      "phase": "ranking",
+      "priority": 10,
+      "kind": "soft",
+      "if_all": ["Ứng viên đã eligible theo R10", "Xét các food xuất hiện trong ứng viên; không đếm một food hai lần"],
+      "then": {
+        "action": "calculate_preference_score",
+        "formula": "Σ (+1 nếu like; -1 nếu dislike; 0 nếu chưa khai báo)",
+        "use": "Chỉ dùng khi goal=none hoặc giá trị mục tiêu bằng nhau; đi xuống các thành phần, đếm mỗi Food một lần. Không khôi phục rejected/requires_review."
+      },
+      "concept_ids": ["user_profile", "food", "dish", "meal", "menu"],
+      "relation_names": ["prefers_food", "uses_ingredient", "contains_dish", "contains_meal"],
+      "source_ids": ["source_th2", "source_design"]
+    },
+    {
+      "id": "R10",
+      "name": "Xác nhận eligible trong phạm vi mô hình",
+      "phase": "eligibility",
+      "priority": 80,
+      "kind": "hard",
+      "if_all": ["Validation cấu trúc không có lỗi", "Các kiểm tra bắt buộc cho user và mọi thành phần đều đủ dữ liệu", "Pha hard_constraints và propagation đã đạt điểm cố định; không có rejected/requires_review"],
+      "then": {
+        "action": "set_status",
+        "target": "candidate for user u",
+        "value": "eligible_in_model",
+        "reason": "all_required_checks_passed",
+        "final_order": "Metric mục tiêu giảm dần, rồi preference_score giảm dần, rồi ID tăng dần."
+      },
+      "concept_ids": ["user_profile", "food", "dish", "meal", "menu"],
+      "relation_names": ["uses_ingredient", "contains_dish", "contains_meal", "follows_diet", "compatible_with_diet"],
+      "source_ids": ["source_th2", "source_design"]
+    }
+  ],
+  "evaluation_plan": ["validate_structure", "hard_constraints + propagation until fixed point", "aggregation", "eligibility", "ranking"],
+  "status_order": ["rejected", "requires_review", "eligible_in_model"],
+  "derived_terms": {
+    "children": "View từ REL04, REL09, REL10; không thêm relation lưu trữ thứ 13.",
+    "candidate_status": "Kết quả suy luận theo user, không phải Concept mới.",
+    "nutrient_total": "Giá trị dẫn xuất R06, không thay số liệu gốc."
+  },
+  "conflict_policy": "Ràng buộc cứng thắng mọi ưu tiên; reject thắng review; không suy eligible khi thiếu dữ liệu. Các rule có pha khác nhau không chạy đơn thuần theo mã hay priority toàn cục.",
+  "comparison_basis": {
+    "food": "per_100g",
+    "dish": "per_serving",
+    "meal": "whole_meal",
+    "menu": "one_day"
+  }
+}
