@@ -103,14 +103,14 @@ Hàm lượng dinh dưỡng là thực thể `nutrient_content` (giá trị trê
 
 ```mermaid
 flowchart LR
-  A[kb/*.json] --> B[kb_loader: nạp + chỉ mục]
-  B --> C{validate_kb}
-  C -- có lỗi --> X[Dừng: KBValidationError, không suy diễn]
-  C -- hợp lệ --> D[hard_constraints + propagation<br/>R01 R03 R04 R05 R13 + R02<br/>lặp tới điểm cố định]
-  D --> E[aggregation<br/>R06 R11 R12]
-  E --> F[eligibility<br/>R10]
-  F --> G[ranking khi truy vấn<br/>R07 R08 R14 → R09 → R15 → ID]
-  G --> H[explain: luật + Facts + đường lan truyền]
+  A["kb/*.json"] --> B["kb_loader: nạp + chỉ mục"]
+  B --> C{"validate_kb"}
+  C -- "có lỗi" --> X["Dừng: KBValidationError, không suy diễn"]
+  C -- "hợp lệ" --> D["hard_constraints + propagation<br/>R01 R03 R04 R05 R13 + R02<br/>lặp tới điểm cố định"]
+  D --> E["aggregation<br/>R06 R11 R12"]
+  E --> F["eligibility<br/>R10"]
+  F --> G["ranking khi truy vấn<br/>R07 R08 R14 → R09 → R15 → ID"]
+  G --> H["explain: luật + Facts + đường lan truyền"]
 ```
 
 - Thứ tự pha đọc từ `rules.json#evaluation_plan`; trong một pha, luật priority cao chạy trước, cùng priority thì theo mã luật.
