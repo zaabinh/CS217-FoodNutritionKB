@@ -573,9 +573,10 @@ class Engine:
                         excluded.append({"group": spec["group"], "because": hit[1]})
                         break
             required = [g for g in then["groups"] if g not in {x["group"] for x in excluded}]
+            membership = then["membership_relation"]
 
             def score(item):
-                present = {kb.group_of(f) for f in self.foods_of(item)}
+                present = {e["object_id"] for f in self.foods_of(item) for e in kb.objects(membership, f)}
                 covered = [g for g in required if g in present]
                 return len(covered), {"value": len(covered), "required": len(required), "covered": covered,
                                       "missing": [g for g in required if g not in present], "excluded": excluded}

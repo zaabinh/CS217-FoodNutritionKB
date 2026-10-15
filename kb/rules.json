@@ -298,7 +298,7 @@
         "target": "candidate for user u",
         "value": "eligible_in_model",
         "reason": "all_required_checks_passed",
-        "final_order": "Metric mục tiêu giảm dần, rồi preference_score giảm dần, rồi ID tăng dần."
+        "final_order": "Metric mục tiêu giảm dần, rồi preference_score giảm dần, rồi độ phủ nhóm thực phẩm (R15, chỉ Menu) giảm dần, rồi ID tăng dần."
       },
       "concept_ids": ["user_profile", "food", "dish", "meal", "menu"],
       "relation_names": ["uses_ingredient", "contains_dish", "contains_meal", "follows_diet", "compatible_with_diet"],
@@ -310,6 +310,220 @@
           "reason": "all_required_checks_passed",
           "concepts": ["food", "dish", "meal", "menu"],
           "final_tie_break": "id_asc"
+        }
+      }
+    },
+    {
+      "id": "R11",
+      "name": "Ước tính nhu cầu năng lượng theo tuổi, giới và mức vận động",
+      "phase": "aggregation",
+      "priority": 65,
+      "kind": "calculation",
+      "if_all": ["u.context có age, sex thuộc {female, male} và activity", "Có hàng của bảng DGA 2020–2025 Table A2-2 ứng với giới và tuổi của u"],
+      "then": {
+        "action": "lookup_energy_requirement",
+        "target": "user u",
+        "output": "energy_requirement (kcal/ngày)",
+        "mapping": "activity low = Sedentary, moderate = Moderately Active, high = Active (ánh xạ thiết kế của nhóm)",
+        "on_missing": "null; không đoán khi sex = unspecified"
+      },
+      "concept_ids": ["user_profile"],
+      "relation_names": [],
+      "source_ids": ["source_dga_energy", "source_design"],
+      "exec": {
+        "then": {
+          "action": "lookup_table",
+          "output": "energy_requirement",
+          "unit": "kcal/ngày",
+          "inputs": {"sex": "?u.context.sex", "age": "?u.context.age", "activity": "?u.context.activity"},
+          "columns": ["sex", "age_min", "age_max", "sedentary", "moderately_active", "active"],
+          "match": [
+            {"input": "sex", "column": "sex"},
+            {"input": "age", "min_column": "age_min", "max_column": "age_max"}
+          ],
+          "select": {
+            "input": "activity",
+            "map": {"low": "sedentary", "moderate": "moderately_active", "high": "active"}
+          },
+          "rows": [
+            ["male", 18, 18, 2400, 2800, 3200],
+            ["male", 19, 20, 2600, 2800, 3000],
+            ["male", 21, 25, 2400, 2800, 3000],
+            ["male", 26, 30, 2400, 2600, 3000],
+            ["male", 31, 35, 2400, 2600, 3000],
+            ["male", 36, 40, 2400, 2600, 2800],
+            ["male", 41, 45, 2200, 2600, 2800],
+            ["male", 46, 50, 2200, 2400, 2800],
+            ["male", 51, 55, 2200, 2400, 2800],
+            ["male", 56, 60, 2200, 2400, 2600],
+            ["male", 61, 65, 2000, 2400, 2600],
+            ["male", 66, 70, 2000, 2200, 2600],
+            ["male", 71, 75, 2000, 2200, 2600],
+            ["male", 76, null, 2000, 2200, 2400],
+            ["female", 18, 18, 1800, 2000, 2400],
+            ["female", 19, 20, 2000, 2200, 2400],
+            ["female", 21, 25, 2000, 2200, 2400],
+            ["female", 26, 30, 1800, 2000, 2400],
+            ["female", 31, 35, 1800, 2000, 2200],
+            ["female", 36, 40, 1800, 2000, 2200],
+            ["female", 41, 45, 1800, 2000, 2200],
+            ["female", 46, 50, 1800, 2000, 2200],
+            ["female", 51, 55, 1600, 1800, 2200],
+            ["female", 56, 60, 1600, 1800, 2200],
+            ["female", 61, 65, 1600, 1800, 2000],
+            ["female", 66, 70, 1600, 1800, 2000],
+            ["female", 71, 75, 1600, 1800, 2000],
+            ["female", 76, null, 1600, 1800, 2000]
+          ]
+        }
+      }
+    },
+    {
+      "id": "R12",
+      "name": "Mục tiêu năng lượng mỗi ngày và tỷ lệ đáp ứng của thực đơn",
+      "phase": "aggregation",
+      "priority": 60,
+      "kind": "calculation",
+      "if_all": ["R11 đã cho energy_requirement(u)", "Nếu u.nutrition_goal = lose_weight thì đã biết giới tính để chọn mức sàn"],
+      "then": {
+        "action": "calculate_energy_target",
+        "target": "user u và từng menu",
+        "formula": "lose_weight: energy_target = max(energy_requirement − 500, 1200 nếu nữ / 1500 nếu nam); mục tiêu khác: energy_target = energy_requirement. Menu: energy_ratio = năng lượng Menu (R06) / energy_target.",
+        "use": "Chỉ hiển thị và dùng cho R14; không đổi trạng thái ứng viên. Không thay thế chỉ định của chuyên gia."
+      },
+      "concept_ids": ["user_profile", "menu", "nutrient"],
+      "relation_names": ["has_nutrient_content", "measures_nutrient", "uses_ingredient", "contains_dish", "contains_meal"],
+      "source_ids": ["source_aha_2013", "source_design"],
+      "exec": {
+        "then": {
+          "action": "energy_target",
+          "requirement": "energy_requirement",
+          "output": "energy_target",
+          "unit": "kcal/ngày",
+          "adjustments": {"lose_weight": {"deficit_kcal": 500, "floor_kcal_by_sex": {"female": 1200, "male": 1500}}},
+          "ratio": {"concept": "menu", "nutrient": "nutrient_energy", "output": "energy_ratio"}
+        }
+      }
+    },
+    {
+      "id": "R13",
+      "name": "Chặn mục tiêu giảm cân khi chưa xác nhận thừa cân",
+      "phase": "hard_constraints",
+      "priority": 90,
+      "kind": "hard",
+      "if_all": ["u.nutrition_goal = lose_weight"],
+      "if_any": ["Thiếu cân nặng hoặc chiều cao nên chưa tính được BMI", "HOẶC BMI = cân nặng (kg) / chiều cao² (m²) < 25, dưới ngưỡng thừa cân của WHO", "HOẶC giới tính chưa xác định nên không ước tính được năng lượng"],
+      "then": {
+        "action": "set_status_unless_rejected",
+        "target": "mọi food của u; R02 lan truyền lên dish/meal/menu",
+        "value": "requires_review",
+        "reason": "weight_loss_not_supported",
+        "trace": "Ghi BMI đã tính hoặc thuộc tính còn thiếu; khuyến nghị hỏi chuyên gia."
+      },
+      "concept_ids": ["user_profile", "food"],
+      "relation_names": [],
+      "source_ids": ["source_who_bmi", "source_aha_2013", "source_design"],
+      "exec": {
+        "when": [{"attr": "?u.nutrition_goal", "op": "eq", "value": "lose_weight"}],
+        "when_any": [
+          {
+            "detail": "bmi_unknown",
+            "target": "?f",
+            "when": [
+              {"expr": "?u.context.weight_kg / (?u.context.height_cm / 100) ** 2", "op": "missing"},
+              {"each": "food", "var": "?f"}
+            ]
+          },
+          {
+            "detail": "bmi_below_threshold",
+            "target": "?f",
+            "when": [
+              {"expr": "?u.context.weight_kg / (?u.context.height_cm / 100) ** 2", "op": "lt", "value": 25},
+              {"each": "food", "var": "?f"}
+            ]
+          },
+          {
+            "detail": "sex_unspecified",
+            "target": "?f",
+            "when": [
+              {"attr": "?u.context.sex", "op": "not_in", "value": ["female", "male"]},
+              {"each": "food", "var": "?f"}
+            ]
+          }
+        ],
+        "then": {
+          "action": "set_status_unless_rejected",
+          "value": "requires_review",
+          "reason": "weight_loss_not_supported"
+        }
+      }
+    },
+    {
+      "id": "R14",
+      "name": "Ưu tiên năng lượng phù hợp mục tiêu giảm cân",
+      "phase": "ranking",
+      "priority": 20,
+      "kind": "soft",
+      "if_all": ["u.nutrition_goal = lose_weight", "R10 cho phép hai ứng viên cùng concept và cùng cơ sở so sánh tương ứng", "Năng lượng của các ứng viên đều known"],
+      "then": {
+        "action": "prefer_candidate",
+        "preferred": "Menu: |năng lượng − energy_target (R12)| nhỏ hơn; Food/Dish/Meal: năng lượng thấp hơn ở cùng cơ sở",
+        "reason": "energy_closer_to_target / lower_energy_at_same_basis"
+      },
+      "concept_ids": ["user_profile", "food", "dish", "meal", "menu", "nutrient", "nutrient_content"],
+      "relation_names": ["has_nutrient_content", "measures_nutrient", "uses_ingredient", "contains_dish", "contains_meal"],
+      "source_ids": ["source_aha_2013", "source_design"],
+      "exec": {
+        "then": {
+          "action": "goal_metric",
+          "goals": {
+            "lose_weight": {
+              "nutrient": "nutrient_energy",
+              "direction": "asc",
+              "by_concept": {"menu": {"mode": "closest_to", "target": "energy_target"}}
+            }
+          }
+        }
+      }
+    },
+    {
+      "id": "R15",
+      "name": "Ưu tiên thực đơn cân bằng nhóm thực phẩm",
+      "phase": "ranking",
+      "priority": 5,
+      "kind": "soft",
+      "if_all": ["Hai Menu đều eligible theo R10", "Đồng hạng theo mục tiêu (R07/R08/R14) và sở thích (R09)"],
+      "then": {
+        "action": "prefer_candidate",
+        "preferred": "Menu phủ nhiều nhóm hơn trong 6 nhóm của bài (tương ứng 6 thành phần cốt lõi của DGA)",
+        "exclude": "Bỏ group_dairy khỏi tập nhóm cần phủ khi u theo diet_vegan hoặc dị ứng allergen_milk",
+        "trace": "Liệt kê nhóm còn thiếu."
+      },
+      "concept_ids": ["user_profile", "menu", "food", "food_group", "diet_pattern", "allergen"],
+      "relation_names": ["belongs_to_group", "uses_ingredient", "contains_dish", "contains_meal", "follows_diet", "allergic_to"],
+      "source_ids": ["source_dga_food_groups", "source_design"],
+      "exec": {
+        "then": {
+          "action": "group_coverage",
+          "applies_to": ["menu"],
+          "membership_relation": "belongs_to_group",
+          "groups": [
+            "group_starch",
+            "group_protein",
+            "group_vegetables",
+            "group_fruits",
+            "group_dairy",
+            "group_fats_oils"
+          ],
+          "exclude_groups": [
+            {
+              "group": "group_dairy",
+              "when_any": [
+                [{"rel": "follows_diet", "args": ["?u", "diet_vegan"]}],
+                [{"rel": "allergic_to", "args": ["?u", "allergen_milk"]}]
+              ]
+            }
+          ]
         }
       }
     }
