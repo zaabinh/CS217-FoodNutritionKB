@@ -1,10 +1,10 @@
 # Test cases
 
-10 ca dưới đây bao phủ truy vấn, R01–R10, thiếu dữ liệu và ngoại lệ. `input` là đầu vào; `expected` là kết quả cần đạt; `rules` là các luật liên quan; `actual_result` sẽ được điền sau khi chạy.
+14 ca dưới đây bao phủ truy vấn, R01–R15, thiếu dữ liệu và ngoại lệ (TC11–TC14 bổ sung cho R11–R15). `input` là đầu vào; `expected` là kết quả cần đạt; `rules` là các luật liên quan; `actual_result` sẽ được điền sau khi chạy.
 
 **Trạng thái chung: chưa thực thi**, do hai tệp Python đang trống. Tất cả `actual_result=null`; kỳ vọng không phải bằng chứng chương trình đã chạy.
 
-Mỗi ca bắt đầu từ dữ liệu gốc. `mutation` chỉ thay đổi bản sao dữ liệu trong bộ nhớ cho ca đó; TC10 áp dụng từng thay đổi riêng, không sửa Facts gốc. `override_goal` thay mục tiêu trên bản sao hồ sơ.
+Mỗi ca bắt đầu từ dữ liệu gốc. `mutation` chỉ thay đổi bản sao dữ liệu trong bộ nhớ cho ca đó; TC10 áp dụng từng thay đổi riêng, không sửa Facts gốc. `override_goal` thay mục tiêu trên bản sao hồ sơ; `override_context` gán và `remove_context` xóa trường trong `context` của bản sao hồ sơ.
 
 ## TC01 — Tra cứu nhóm và protein của cơm
 
@@ -255,6 +255,105 @@ Mỗi ca bắt đầu từ dữ liệu gốc. `mutation` chỉ thay đổi bản
     "inference_not_started": true
   },
   "rules": [],
+  "actual_result": null
+}
+```
+
+## TC11 — Nhu cầu và mục tiêu năng lượng theo tuổi/giới/vận động
+
+```json
+{
+  "id": "TC11",
+  "input": {
+    "subcases": [
+      {"user_id": "user_minh"},
+      {"user_id": "user_lan"},
+      {"user_id": "user_an"},
+      {"user_id": "user_minh", "override_context": {"sex": "unspecified"}}
+    ],
+    "ratio_check": {"user_id": "user_an", "menu_id": "menu_milk_free"}
+  },
+  "expected": {
+    "energy_requirement": [2800, 2000, 1800, null],
+    "energy_target": [2800, 2000, 1300, null],
+    "unit": "kcal/ngày",
+    "menu_energy_ratio": 1.0264,
+    "tolerance": 0.0001
+  },
+  "rules": ["R11", "R12", "R06"],
+  "actual_result": null
+}
+```
+
+## TC12 — Mục tiêu giảm cân bị chặn khi BMI < 25 hoặc thiếu dữ liệu
+
+```json
+{
+  "id": "TC12",
+  "input": {
+    "subcases": [
+      {"user_id": "user_tam", "menu_id": "menu_ordinary"},
+      {"user_id": "user_an", "menu_id": "menu_ordinary"},
+      {"user_id": "user_an", "menu_id": "menu_ordinary", "remove_context": ["weight_kg"]}
+    ]
+  },
+  "expected": {
+    "statuses": ["requires_review", "eligible_in_model", "requires_review"],
+    "details": [["bmi_below_threshold"], [], ["bmi_unknown"]],
+    "bmi_premise_contains": "19.61"
+  },
+  "rules": ["R13", "R02", "R10"],
+  "actual_result": null
+}
+```
+
+## TC13 — Giảm cân: Menu gần mục tiêu năng lượng hơn, Dish ít năng lượng hơn
+
+```json
+{
+  "id": "TC13",
+  "input": {
+    "user_id": "user_an",
+    "menu_ids": ["menu_ordinary", "menu_vegetarian", "menu_vegan", "menu_milk_free", "menu_vegan_peanut_free"],
+    "dish_ids": ["dish_rice_chicken", "dish_fruit_plate", "dish_lentil_potato"]
+  },
+  "expected": {
+    "energy_target": 1300,
+    "menu_order": ["menu_milk_free", "menu_vegetarian", "menu_vegan", "menu_ordinary", "menu_vegan_peanut_free"],
+    "menu_energy_kcal": {
+      "menu_milk_free": 1334.3,
+      "menu_vegetarian": 1233.55,
+      "menu_vegan": 1199.5,
+      "menu_ordinary": 1438.7,
+      "menu_vegan_peanut_free": 1035.0
+    },
+    "dish_order": ["dish_fruit_plate", "dish_lentil_potato", "dish_rice_chicken"],
+    "tolerance": 0.0001
+  },
+  "rules": ["R06", "R12", "R14", "R10"],
+  "actual_result": null
+}
+```
+
+## TC14 — Cân bằng nhóm thực phẩm phân định khi đồng hạng
+
+```json
+{
+  "id": "TC14",
+  "input": {
+    "subcases": [
+      {"user_id": "user_huy", "menu_ids": ["menu_vegan_peanut_free", "menu_vegetarian"]},
+      {"user_id": "user_quang", "menu_ids": ["menu_vegan_peanut_free"]}
+    ]
+  },
+  "expected": {
+    "order": ["menu_vegetarian", "menu_vegan_peanut_free"],
+    "decided_by": ["R15"],
+    "coverage": {"menu_vegetarian": "6/6", "menu_vegan_peanut_free": "5/6"},
+    "vegan_coverage": {"menu_vegan_peanut_free": "5/5"},
+    "vegan_excluded_groups": ["group_dairy"]
+  },
+  "rules": ["R09", "R15", "R10"],
   "actual_result": null
 }
 ```

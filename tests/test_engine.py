@@ -162,6 +162,75 @@ class ConflictsAndRanking(unittest.TestCase):
         self.assertEqual(ranking["basis"], "per_100g")
 
 
+class EnergyAndWeightGoal(unittest.TestCase):
+    """R11–R15: năng lượng, giảm cân an toàn, cân bằng nhóm."""
+
+    def _values(self, **context):
+        raw = base_raw()
+        user(raw, "user_minh")["context"].update(context)
+        return engine_for(raw).infer("user_minh").user_values
+
+    def test_energy_table_boundaries(self):
+        self.assertEqual(self._values(age=20, activity="low")["energy_requirement"]["value"], 2600)
+        self.assertEqual(self._values(age=21, activity="low")["energy_requirement"]["value"], 2400)
+        self.assertEqual(self._values(age=90, activity="high")["energy_requirement"]["value"], 2400)
+        self.assertEqual(self._values(age=90, sex="female", activity="low")["energy_requirement"]["value"], 1600)
+
+    def test_every_adult_age_sex_activity_has_a_value(self):
+        raw = base_raw()
+        rule = next(r for r in raw["rules"]["rules"] if r["id"] == "R11")
+        rows = rule["exec"]["then"]["rows"]
+        for sex in ("male", "female"):
+            for age in range(18, 101):
+                hits = [r for r in rows if r[0] == sex and r[1] <= age and (r[2] is None or age <= r[2])]
+                self.assertEqual(len(hits), 1, f"{sex} {age} tuổi khớp {len(hits)} hàng")
+
+    def test_unspecified_sex_gives_null_not_a_guess(self):
+        values = self._values(sex="unspecified")
+        self.assertIsNone(values["energy_requirement"]["value"])
+        self.assertIsNone(values["energy_target"]["value"])
+
+    def test_weight_loss_target_never_below_floor(self):
+        raw = base_raw()
+        user(raw, "user_an")["context"].update(age=80)        # EER 1600 -> 1600 - 500 < sàn 1200
+        self.assertEqual(engine_for(raw).infer("user_an").user_values["energy_target"]["value"], 1200)
+
+    def test_weight_loss_blocked_without_bmi_or_below_threshold(self):
+        eng = engine_for(base_raw())
+        tam = eng.infer("user_tam")
+        for concept in CANDIDATES:
+            for item in eng.kb.items(concept):
+                self.assertEqual(tam.status(item["id"]), REVIEW, item["id"])
+        raw = base_raw()
+        user(raw, "user_an")["context"]["sex"] = "unspecified"
+        res = engine_for(raw).infer("user_an")
+        self.assertIn("sex_unspecified", res.details("menu_ordinary"))
+
+    def test_other_goals_do_not_need_weight(self):
+        res = engine_for(base_raw()).infer("user_minh")   # không có weight_kg/height_cm
+        self.assertEqual(res.status("menu_milk_free"), ELIGIBLE)
+
+    def test_allergy_still_wins_over_weight_loss_goal(self):
+        raw = base_raw()
+        add_edge(raw, "fact_t_an_allergy", "allergic_to", "user_an", "allergen_milk")
+        eng = engine_for(raw)
+        res = eng.infer("user_an")
+        self.assertEqual(res.status("menu_ordinary"), REJECTED)
+        self.assertNotIn("menu_ordinary", eng.rank(res, concept="menu")["order"])
+
+    def test_dairy_not_required_for_milk_allergy(self):
+        eng = engine_for(base_raw())
+        ranking = eng.rank(eng.infer("user_minh"), concept="menu")
+        for scores in ranking["scores"].values():
+            self.assertEqual(scores["R15"]["required"], 5)
+            self.assertEqual(scores["R15"]["excluded"][0]["group"], "group_dairy")
+
+    def test_group_coverage_only_for_menus(self):
+        eng = engine_for(base_raw())
+        ranking = eng.rank(eng.infer("user_huy"), concept="dish")
+        self.assertNotIn("R15", ranking["criteria"])
+
+
 class Extensibility(unittest.TestCase):
     """Thêm luật bằng JSON, không sửa engine."""
 

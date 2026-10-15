@@ -281,6 +281,100 @@ def tc10(case):
     return actual, problems
 
 
+def user_context(raw: dict, user_id: str) -> dict:
+    return next(u for u in raw["facts"]["entities"]["user_profile"] if u["id"] == user_id)["context"]
+
+
+def raw_for_subcase(sub: dict) -> dict:
+    raw = base_raw()
+    if "override_goal" in sub:
+        set_user_goal(raw, sub["user_id"], sub["override_goal"])
+    context = user_context(raw, sub["user_id"])
+    context.update(sub.get("override_context", {}))
+    for field in sub.get("remove_context", []):
+        context.pop(field, None)
+    return raw
+
+
+@runner("TC11")
+def tc11(case):
+    exp, inp = case["expected"], case["input"]
+    requirement, target, problems = [], [], []
+    for sub in inp["subcases"]:
+        res = engine_for(raw_for_subcase(sub)).infer(sub["user_id"])
+        requirement.append(res.user_values["energy_requirement"]["value"])
+        target.append(res.user_values["energy_target"]["value"])
+    check = inp["ratio_check"]
+    res = engine_for(base_raw()).infer(check["user_id"])
+    ratio = res.item_values[check["menu_id"]]["energy_ratio"]
+    actual = {"energy_requirement": requirement, "energy_target": target,
+              "unit": res.user_values["energy_target"]["unit"], "menu_energy_ratio": round(ratio, 6),
+              "rows_used": res.user_values["energy_requirement"]["detail"]}
+    check_equal(problems, "energy_requirement", requirement, exp["energy_requirement"])
+    check_equal(problems, "energy_target", target, exp["energy_target"])
+    check_equal(problems, "unit", actual["unit"], exp["unit"])
+    if not close(ratio, exp["menu_energy_ratio"], exp["tolerance"]):
+        problems.append(f"menu_energy_ratio {ratio} ≠ {exp['menu_energy_ratio']}")
+    return actual, problems
+
+
+@runner("TC12")
+def tc12(case):
+    exp = case["expected"]
+    statuses, details, premises, problems = [], [], [], []
+    for sub in case["input"]["subcases"]:
+        res = engine_for(raw_for_subcase(sub)).infer(sub["user_id"])
+        item = sub["menu_id"]
+        statuses.append(res.status(item))
+        details.append(res.details(item, "requires_review") if res.status(item) == "requires_review" else [])
+        premises.extend(p for o in res.origins(item) if o["rule_id"] == "R13" for p in o["premises"])
+    actual = {"statuses": statuses, "details": details, "r13_premises": sorted(set(premises))}
+    check_equal(problems, "statuses", statuses, exp["statuses"])
+    check_equal(problems, "details", details, exp["details"])
+    if not any(exp["bmi_premise_contains"] in p for p in premises):
+        problems.append(f"không thấy BMI {exp['bmi_premise_contains']} trong tiền đề R13")
+    return actual, problems
+
+
+@runner("TC13")
+def tc13(case):
+    exp, inp = case["expected"], case["input"]
+    eng = engine_for(base_raw())
+    res = eng.infer(inp["user_id"])
+    menus = eng.rank(res, inp["menu_ids"])
+    dishes = eng.rank(res, inp["dish_ids"])
+    energy = {m: round(res.nutrients[m]["nutrient_energy"], 6) for m in inp["menu_ids"]}
+    actual = {"energy_target": res.user_values["energy_target"]["value"], "menu_order": menus["order"],
+              "menu_energy_kcal": energy, "menu_decided_by": [d["rule_id"] for d in menus["decisions"]],
+              "dish_order": dishes["order"]}
+    problems = []
+    check_equal(problems, "energy_target", actual["energy_target"], exp["energy_target"])
+    check_equal(problems, "menu_order", menus["order"], exp["menu_order"])
+    check_equal(problems, "dish_order", dishes["order"], exp["dish_order"])
+    for m, value in exp["menu_energy_kcal"].items():
+        if not close(energy[m], value, exp["tolerance"]):
+            problems.append(f"năng lượng {m}: {energy[m]} ≠ {value}")
+    return actual, problems
+
+
+@runner("TC14")
+def tc14(case):
+    exp = case["expected"]
+    first, second = case["input"]["subcases"]
+    eng = engine_for(base_raw())
+    ranking = eng.rank(eng.infer(first["user_id"]), first["menu_ids"])
+    coverage = {m: f"{s['R15']['value']}/{s['R15']['required']}" for m, s in ranking["scores"].items()}
+    vegan = eng.rank(eng.infer(second["user_id"]), second["menu_ids"])
+    vegan_cov = {m: f"{s['R15']['value']}/{s['R15']['required']}" for m, s in vegan["scores"].items()}
+    excluded = sorted({x["group"] for s in vegan["scores"].values() for x in s["R15"]["excluded"]})
+    actual = {"order": ranking["order"], "decided_by": [d["rule_id"] for d in ranking["decisions"]],
+              "coverage": coverage, "vegan_coverage": vegan_cov, "vegan_excluded_groups": excluded}
+    problems = []
+    for key in ("order", "decided_by", "coverage", "vegan_coverage", "vegan_excluded_groups"):
+        check_equal(problems, key, actual[key], exp[key])
+    return actual, problems
+
+
 def run_case(case: dict) -> tuple[dict, list[str]]:
     fn = RUNNERS.get(case["id"])
     if fn is None:
