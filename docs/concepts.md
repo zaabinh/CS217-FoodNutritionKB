@@ -9,16 +9,16 @@ Nguồn chung của bảng: `source_th1`, `source_th2`, `source_design`; tra m�
 
 | Concept | Ý nghĩa | Cú pháp | Ký hiệu ví dụ | Facts | Rules |
 | --- | --- | --- | --- | --- | --- |
-| `food` | Thực phẩm hoặc nguyên liệu, phân biệt theo trạng thái bản ghi. | `food(id)` | `food(food_rice_cooked)` | `food_rice_cooked` | R01, R02, R03, R04, R05, R06, R07, R08, R09, R10 |
-| `food_group` | Nhóm phân loại chính do bài thiết kế; không phải ngưỡng giàu chất. | `food_group(id)` | `food_group(group_starch)` | `group_starch` | — |
-| `nutrient` | Đại lượng dinh dưỡng; năng lượng được đưa chung vào danh mục theo yêu cầu. | `nutrient(id)` | `nutrient(nutrient_protein)` | `nutrient_protein` | R06, R07, R08 |
+| `food` | Thực phẩm hoặc nguyên liệu, phân biệt theo trạng thái bản ghi. | `food(id)` | `food(food_rice_cooked)` | `food_rice_cooked` | R01, R02, R03, R04, R05, R06, R07, R08, R09, R10, R13, R14, R15 |
+| `food_group` | Nhóm phân loại chính do bài thiết kế; không phải ngưỡng giàu chất. | `food_group(id)` | `food_group(group_starch)` | `group_starch` | R15 |
+| `nutrient` | Đại lượng dinh dưỡng; năng lượng được đưa chung vào danh mục theo yêu cầu. | `nutrient(id)` | `nutrient(nutrient_protein)` | `nutrient_protein` | R06, R07, R08, R12, R14 |
 | `nutrient_content` | Bản ghi hàm lượng của một food và một nutrient. | `nutrient_content(id)` | `nutrient_content(nc_rice_cooked_protein)` | `nc_rice_cooked_protein` | R05, R06, R07, R08 |
-| `allergen` | Tác nhân dị ứng trong danh mục 5 của bài. | `allergen(id)` | `allergen(allergen_milk)` | `allergen_milk` | R01 |
-| `dish` | Công thức phối hợp các nguyên liệu đã ở đúng trạng thái trong Food. | `dish(id)` | `dish(dish_rice_chicken)` | `dish_rice_chicken` | R02, R05, R06, R07, R08, R09, R10 |
-| `meal` | Bữa ăn cụ thể; breakfast/lunch/dinner là loại, không phải ID bữa. | `meal(id)` | `meal(meal_ordinary_breakfast)` | `meal_ordinary_breakfast` | R02, R06, R07, R08, R09, R10 |
-| `menu` | Thực đơn một ngày trong phạm vi thiết kế này. | `menu(id)` | `menu(menu_ordinary)` | `menu_ordinary` | R02, R06, R07, R08, R09, R10 |
-| `user_profile` | Hồ sơ đầu vào giả lập; các khai báo không phải tri thức chuyên môn. | `user_profile(id)` | `user_profile(user_minh)` | `user_minh` | R01, R03, R04, R05, R07, R08, R09, R10 |
-| `diet_pattern` | Định nghĩa chế độ ăn được chọn cho bài. | `diet_pattern(id)` | `diet_pattern(diet_vegan)` | `diet_vegan` | R03, R05 |
+| `allergen` | Tác nhân dị ứng trong danh mục 5 của bài. | `allergen(id)` | `allergen(allergen_milk)` | `allergen_milk` | R01, R15 |
+| `dish` | Công thức phối hợp các nguyên liệu đã ở đúng trạng thái trong Food. | `dish(id)` | `dish(dish_rice_chicken)` | `dish_rice_chicken` | R02, R05, R06, R07, R08, R09, R10, R13, R14 |
+| `meal` | Bữa ăn cụ thể; breakfast/lunch/dinner là loại, không phải ID bữa. | `meal(id)` | `meal(meal_ordinary_breakfast)` | `meal_ordinary_breakfast` | R02, R06, R07, R08, R09, R10, R13, R14 |
+| `menu` | Thực đơn một ngày trong phạm vi thiết kế này. | `menu(id)` | `menu(menu_ordinary)` | `menu_ordinary` | R02, R06, R07, R08, R09, R10, R12, R13, R14, R15 |
+| `user_profile` | Hồ sơ đầu vào giả lập; các khai báo không phải tri thức chuyên môn. | `user_profile(id)` | `user_profile(user_minh)` | `user_minh` | R01, R03, R04, R05, R07, R08, R09, R10, R11, R12, R13, R14, R15 |
+| `diet_pattern` | Định nghĩa chế độ ăn được chọn cho bài. | `diet_pattern(id)` | `diet_pattern(diet_vegan)` | `diet_vegan` | R03, R05, R15 |
 
 ## Attributes và kiểu dữ liệu
 
@@ -34,7 +34,7 @@ Mỗi Concept có 3–6 thuộc tính nghiệp vụ; tất cả bắt buộc có
 | `dish` | `id`: string<br>`name`: string<br>`servings`: integer ≥1<br>`recipe_status`: string {complete, unknown} |
 | `meal` | `id`: string<br>`name`: string<br>`meal_type`: string {breakfast, lunch, dinner} |
 | `menu` | `id`: string<br>`name`: string<br>`scope`: string = one_day |
-| `user_profile` | `id`: string<br>`name`: string<br>`context`: object (age:integer≥18; sex:string{female,male,unspecified}; activity:string{low,moderate,high}; đủ các trường)<br>`nutrition_goal`: string {prefer_protein, prefer_fiber, prefer_calcium, none}<br>`allergy_status`: string {complete, unknown}<br>`avoid_status`: string {complete, unknown} |
+| `user_profile` | `id`: string<br>`name`: string<br>`context`: object (age:integer≥18; sex:string{female,male,unspecified}; activity:string{low,moderate,high}; đủ các trường; tùy chọn weight_kg:number>0 kg, height_cm:number>0 cm cho R13)<br>`nutrition_goal`: string {prefer_protein, prefer_fiber, prefer_calcium, none, lose_weight}<br>`allergy_status`: string {complete, unknown}<br>`avoid_status`: string {complete, unknown} |
 | `diet_pattern` | `id`: string<br>`name`: string<br>`policy_description`: string<br>`policy_status`: string {complete, unknown} |
 
 ## Facts và nguồn
@@ -49,7 +49,7 @@ Mỗi Concept có 3–6 thuộc tính nghiệp vụ; tất cả bắt buộc có
 | `dish` | 12 |
 | `meal` | 15 |
 | `menu` | 5 |
-| `user_profile` | 5 |
+| `user_profile` | 7 |
 | `diet_pattern` | 3 |
 
 `edges` lưu quan hệ khẳng định; `negative_edges` lưu phủ định tường minh. Mỗi cạnh có `id`, `relation`, `subject_id`, `object_id`, `attributes` và `_meta.source_ids`. ID phải duy nhất, đầu mút đúng Concept và bội số trong Relations.
@@ -76,7 +76,7 @@ NutrientContent liên kết với Food qua `has_nutrient_content` và Nutrient q
 - `value` tính trên `basis_g=100` g phần ăn được, đúng trạng thái `food_state`. Đơn vị: năng lượng kcal; protein/lipid/carbohydrate/chất xơ g; canxi mg.
 - `status=known` cần giá trị không âm và `source_record_id`. `status=unknown` giữ `value=null`; không đổi thành 0. Hiện chất xơ của `food_shrimp_cooked` chưa có giá trị.
 - Nguồn dinh dưỡng: USDA SR Legacy 2018. `Food._meta.fdc_id` là mã thực phẩm, `source_description` là mô tả gốc; `Nutrient.usda_nutrient_id` là mã chất, `NutrientContent.source_record_id` là mã dòng giá trị.
-- Dị ứng/chế độ ăn dẫn nguồn FDA/NHS; nhóm thực phẩm, công thức và bội số là thiết kế của nhóm. Hồ sơ người dùng là dữ liệu giả lập.
+- Dị ứng/chế độ ăn dẫn nguồn FDA/NHS; nhóm thực phẩm, công thức và bội số là thiết kế của nhóm. Hồ sơ người dùng là dữ liệu giả lập. Năng lượng, BMI và nhóm thực phẩm cho R11–R15 dẫn nguồn DGA 2020–2025 (`source_dga_energy`, `source_dga_food_groups`), AHA/ACC/TOS 2013 (`source_aha_2013`) và WHO (`source_who_bmi`).
 - `complete` chỉ xác nhận đã đánh giá hết danh mục trong bài (5 tác nhân, 3 chế độ); `unknown` giữ trạng thái chưa biết. Các chế độ: thông thường, chay lacto-ovo (có trứng/sữa), thuần chay.
 
 Công thức sử dụng khối lượng nguyên liệu ở đúng trạng thái bản ghi; không tự tính biến đổi khi nấu. 15 Meal là các bữa cụ thể thuộc 3 loại `breakfast/lunch/dinner`; Menu mẫu có phạm vi `one_day`.
