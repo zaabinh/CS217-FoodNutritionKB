@@ -360,8 +360,9 @@ def summary(raw: dict) -> dict:
 
 
 def main(argv=None) -> int:
-    if hasattr(sys.stdout, "reconfigure"):
-        sys.stdout.reconfigure(encoding="utf-8")
+    for stream in (sys.stdout, sys.stderr):
+        if hasattr(stream, "reconfigure"):
+            stream.reconfigure(encoding="utf-8")
     parser = argparse.ArgumentParser(description="Kiểm tra tính hợp lệ của CSTT dinh dưỡng.")
     parser.add_argument("--kb", default=str(KB_DIR), help="thư mục chứa 4 tệp JSON (mặc định: kb/)")
     parser.add_argument("--json", action="store_true", help="in kết quả dạng JSON")
