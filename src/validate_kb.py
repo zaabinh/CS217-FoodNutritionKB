@@ -150,6 +150,12 @@ def validate(raw: dict) -> list[Issue]:
         for end in ("domain", "range"):
             if r.get(end) not in concepts:
                 col.error("unknown_concept", f"relations:{r['name']}", f"{end}={r.get(end)!r} không phải concept")
+        domain_attrs = {a["name"] for a in concepts.get(r.get("domain"), {}).get("attributes", [])}
+        for policy in r.get("negative_rules", []):
+            attr = policy.get("status_attribute")
+            if attr is not None and attr not in domain_attrs:
+                col.error("unknown_attribute", f"relations:{r['name']}",
+                          f"status_attribute={attr!r} không phải thuộc tính của {r.get('domain')}")
 
     facts = raw["facts"]
     sources = {}

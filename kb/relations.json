@@ -104,7 +104,8 @@
           "syntax": "Not(contains_allergen(food, allergen))",
           "policy": "explicit_negative_or_scoped_complete_list",
           "condition": "allergen_status=complete AND object thuộc danh mục đã đánh giá AND thiếu cạnh khẳng định; hoặc phủ định tường minh có nguồn. Nếu unknown và không có bằng chứng riêng: unknown.",
-          "scope": "allergen"
+          "scope": "allergen",
+          "status_attribute": "allergen_status"
         }
       ]
     },
@@ -165,7 +166,8 @@
           "syntax": "Not(compatible_with_diet(food, diet_pattern))",
           "policy": "explicit_negative_or_scoped_complete_list",
           "condition": "diet_status=complete AND object thuộc danh mục đã đánh giá AND thiếu cạnh khẳng định; hoặc phủ định tường minh có nguồn. Nếu unknown và không có bằng chứng riêng: unknown.",
-          "scope": "diet_pattern"
+          "scope": "diet_pattern",
+          "status_attribute": "diet_status"
         }
       ]
     },

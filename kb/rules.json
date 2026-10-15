@@ -17,7 +17,14 @@
       },
       "concept_ids": ["user_profile", "food", "allergen"],
       "relation_names": ["allergic_to", "contains_allergen"],
-      "source_ids": ["source_fda", "source_design"]
+      "source_ids": ["source_fda", "source_design"],
+      "exec": {
+        "when": [
+          {"rel": "allergic_to", "args": ["?u", "?a"]},
+          {"rel": "contains_allergen", "args": ["?f", "?a"], "truth": "true"}
+        ],
+        "then": {"action": "set_status", "target": "?f", "value": "rejected", "reason": "allergen_match"}
+      }
     },
     {
       "id": "R02",
@@ -34,7 +41,14 @@
       },
       "concept_ids": ["food", "dish", "meal", "menu"],
       "relation_names": ["uses_ingredient", "contains_dish", "contains_meal"],
-      "source_ids": ["source_th2", "source_design"]
+      "source_ids": ["source_th2", "source_design"],
+      "exec": {
+        "then": {
+          "action": "propagate_status",
+          "via": ["uses_ingredient", "contains_dish", "contains_meal"],
+          "order": ["rejected", "requires_review"]
+        }
+      }
     },
     {
       "id": "R03",
@@ -52,7 +66,14 @@
       },
       "concept_ids": ["user_profile", "diet_pattern", "food"],
       "relation_names": ["follows_diet", "compatible_with_diet"],
-      "source_ids": ["source_vegetarian", "source_vegan", "source_design"]
+      "source_ids": ["source_vegetarian", "source_vegan", "source_design"],
+      "exec": {
+        "when": [
+          {"rel": "follows_diet", "args": ["?u", "?d"]},
+          {"rel": "compatible_with_diet", "args": ["?f", "?d"], "truth": "false"}
+        ],
+        "then": {"action": "set_status", "target": "?f", "value": "rejected", "reason": "diet_mismatch"}
+      }
     },
     {
       "id": "R04",
@@ -70,7 +91,20 @@
       },
       "concept_ids": ["user_profile", "food"],
       "relation_names": ["avoids_food"],
-      "source_ids": ["source_th2", "source_design"]
+      "source_ids": ["source_th2", "source_design"],
+      "exec": {
+        "when": [{"rel": "avoids_food", "args": ["?u", "?f"]}],
+        "then": {
+          "action": "set_status",
+          "target": "?f",
+          "value": "rejected",
+          "reason": "explicit_avoid",
+          "note_if": {
+            "when": [{"rel": "prefers_food", "args": ["?u", "?f"], "where": {"preference": "like"}}],
+            "note": "avoid_overrides_like"
+          }
+        }
+      }
     },
     {
       "id": "R05",
@@ -88,7 +122,61 @@
       "concept_ids": ["user_profile", "food", "dish", "nutrient_content", "diet_pattern"],
       "relation_names": ["follows_diet", "compatible_with_diet", "has_nutrient_content", "measures_nutrient", "uses_ingredient"],
       "source_ids": ["source_th2", "source_design"],
-      "if_any": ["Thiếu khai báo dị ứng/tránh của user hoặc thiếu hồ sơ chế độ", "HOẶC food allergen_status=unknown, kết quả chế độ đang chọn unknown, recipe_status=unknown", "HOẶC hàm lượng cần cho mục tiêu hoặc định lượng thành phần chưa biết"]
+      "if_any": ["Thiếu khai báo dị ứng/tránh của user hoặc thiếu hồ sơ chế độ", "HOẶC food allergen_status=unknown, kết quả chế độ đang chọn unknown, recipe_status=unknown", "HOẶC hàm lượng cần cho mục tiêu hoặc định lượng thành phần chưa biết"],
+      "exec": {
+        "when_any": [
+          {
+            "detail": "user_allergy_status_unknown",
+            "target": "?f",
+            "when": [{"attr": "?u.allergy_status", "op": "eq", "value": "unknown"}, {"each": "food", "var": "?f"}]
+          },
+          {
+            "detail": "user_avoid_status_unknown",
+            "target": "?f",
+            "when": [{"attr": "?u.avoid_status", "op": "eq", "value": "unknown"}, {"each": "food", "var": "?f"}]
+          },
+          {
+            "detail": "diet_policy_unknown",
+            "target": "?f",
+            "when": [
+              {"rel": "follows_diet", "args": ["?u", "?d"]},
+              {"attr": "?d.policy_status", "op": "eq", "value": "unknown"},
+              {"each": "food", "var": "?f"}
+            ]
+          },
+          {
+            "detail": "food_allergen_unknown",
+            "target": "?f",
+            "when": [
+              {"rel": "allergic_to", "args": ["?u", "?a"]},
+              {"rel": "contains_allergen", "args": ["?f", "?a"], "truth": "unknown"}
+            ]
+          },
+          {
+            "detail": "food_diet_unknown",
+            "target": "?f",
+            "when": [
+              {"rel": "follows_diet", "args": ["?u", "?d"]},
+              {"rel": "compatible_with_diet", "args": ["?f", "?d"], "truth": "unknown"}
+            ]
+          },
+          {
+            "detail": "recipe_unknown",
+            "target": "?x",
+            "when": [{"each": "dish", "var": "?x"}, {"attr": "?x.recipe_status", "op": "eq", "value": "unknown"}]
+          },
+          {
+            "detail": "goal_nutrient_unknown",
+            "target": "?f",
+            "when": [{"goal_nutrient": ["?u", "?n"]}, {"nutrient_value": ["?f", "?n"], "truth": "unknown"}]
+          }
+        ],
+        "then": {
+          "action": "set_status_unless_rejected",
+          "value": "requires_review",
+          "reason": "missing_required_data"
+        }
+      }
     },
     {
       "id": "R06",
@@ -104,7 +192,24 @@
       },
       "concept_ids": ["food", "nutrient", "nutrient_content", "dish", "meal", "menu"],
       "relation_names": ["has_nutrient_content", "measures_nutrient", "uses_ingredient", "contains_dish", "contains_meal"],
-      "source_ids": ["source_usda_dictionary", "source_design"]
+      "source_ids": ["source_usda_dictionary", "source_design"],
+      "exec": {
+        "then": {
+          "action": "aggregate_nutrients",
+          "steps": [
+            {
+              "concept": "dish",
+              "via": "uses_ingredient",
+              "weight_attr": "amount_g",
+              "per_basis_g": true,
+              "divide_by_attr": "servings",
+              "basis": "per_serving"
+            },
+            {"concept": "meal", "via": "contains_dish", "weight_attr": "servings", "basis": "whole_meal"},
+            {"concept": "menu", "via": "contains_meal", "basis": "one_day"}
+          ]
+        }
+      }
     },
     {
       "id": "R07",
@@ -121,7 +226,13 @@
       },
       "concept_ids": ["user_profile", "food", "dish", "meal", "menu", "nutrient", "nutrient_content"],
       "relation_names": ["has_nutrient_content", "measures_nutrient", "uses_ingredient", "contains_dish", "contains_meal"],
-      "source_ids": ["source_th1", "source_design"]
+      "source_ids": ["source_th1", "source_design"],
+      "exec": {
+        "then": {
+          "action": "goal_metric",
+          "goals": {"prefer_protein": {"nutrient": "nutrient_protein", "direction": "desc"}}
+        }
+      }
     },
     {
       "id": "R08",
@@ -138,7 +249,16 @@
       },
       "concept_ids": ["user_profile", "food", "dish", "meal", "menu", "nutrient", "nutrient_content"],
       "relation_names": ["has_nutrient_content", "measures_nutrient", "uses_ingredient", "contains_dish", "contains_meal"],
-      "source_ids": ["source_th1", "source_design"]
+      "source_ids": ["source_th1", "source_design"],
+      "exec": {
+        "then": {
+          "action": "goal_metric",
+          "goals": {
+            "prefer_fiber": {"nutrient": "nutrient_fiber", "direction": "desc"},
+            "prefer_calcium": {"nutrient": "nutrient_calcium", "direction": "desc"}
+          }
+        }
+      }
     },
     {
       "id": "R09",
@@ -154,7 +274,17 @@
       },
       "concept_ids": ["user_profile", "food", "dish", "meal", "menu"],
       "relation_names": ["prefers_food", "uses_ingredient", "contains_dish", "contains_meal"],
-      "source_ids": ["source_th2", "source_design"]
+      "source_ids": ["source_th2", "source_design"],
+      "exec": {
+        "then": {
+          "action": "preference_score",
+          "relation": "prefers_food",
+          "attribute": "preference",
+          "weights": {"like": 1, "dislike": -1},
+          "default": 0,
+          "count_each_food_once": true
+        }
+      }
     },
     {
       "id": "R10",
@@ -172,7 +302,16 @@
       },
       "concept_ids": ["user_profile", "food", "dish", "meal", "menu"],
       "relation_names": ["uses_ingredient", "contains_dish", "contains_meal", "follows_diet", "compatible_with_diet"],
-      "source_ids": ["source_th2", "source_design"]
+      "source_ids": ["source_th2", "source_design"],
+      "exec": {
+        "then": {
+          "action": "set_eligible",
+          "value": "eligible_in_model",
+          "reason": "all_required_checks_passed",
+          "concepts": ["food", "dish", "meal", "menu"],
+          "final_tie_break": "id_asc"
+        }
+      }
     }
   ],
   "evaluation_plan": ["validate_structure", "hard_constraints + propagation until fixed point", "aggregation", "eligibility", "ranking"],
