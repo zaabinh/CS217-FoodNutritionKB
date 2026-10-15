@@ -2,7 +2,7 @@
 
 14 ca dưới đây bao phủ truy vấn, R01–R15, thiếu dữ liệu và ngoại lệ (TC11–TC14 bổ sung cho R11–R15). `input` là đầu vào; `expected` là kết quả cần đạt; `rules` là các luật liên quan; `actual_result` sẽ được điền sau khi chạy.
 
-**Trạng thái chung: chưa thực thi**, do hai tệp Python đang trống. Tất cả `actual_result=null`; kỳ vọng không phải bằng chứng chương trình đã chạy.
+**Trạng thái chung: đã thực thi ngày 2026-10-15 — 14/14 PASS.** `actual_result` do `python tests/update_case_results.py` ghi tự động từ kết quả chương trình, không chép tay; `python -m unittest discover -s tests` chạy lại cùng các ca này.
 
 Mỗi ca bắt đầu từ dữ liệu gốc. `mutation` chỉ thay đổi bản sao dữ liệu trong bộ nhớ cho ca đó; TC10 áp dụng từng thay đổi riêng, không sửa Facts gốc. `override_goal` thay mục tiêu trên bản sao hồ sơ; `override_context` gán và `remove_context` xóa trường trong `context` của bản sao hồ sơ.
 
@@ -21,7 +21,12 @@ Mỗi ca bắt đầu từ dữ liệu gốc. `mutation` chỉ thay đổi bản
     "unit": "g"
   },
   "rules": [],
-  "actual_result": null
+  "actual_result": {
+    "status": "PASS",
+    "run_on": "2026-10-15",
+    "command": "python tests/update_case_results.py",
+    "observed": {"group_id": "group_starch", "protein_per_100g": 2.69, "unit": "g"}
+  }
 }
 ```
 
@@ -40,7 +45,17 @@ Mỗi ca bắt đầu từ dữ liệu gốc. `mutation` chỉ thay đổi bản
     "allergen_id": "allergen_peanut"
   },
   "rules": ["R01"],
-  "actual_result": null
+  "actual_result": {
+    "status": "PASS",
+    "run_on": "2026-10-15",
+    "command": "python tests/update_case_results.py",
+    "observed": {
+      "status": "rejected",
+      "reasons": ["allergen_match"],
+      "allergen_ids": ["allergen_peanut"],
+      "rules_fired": ["R01"]
+    }
+  }
 }
 ```
 
@@ -60,7 +75,17 @@ Mỗi ca bắt đầu từ dữ liệu gốc. `mutation` chỉ thay đổi bản
     "path": ["food_milk_whole", "dish_oat_milk", "meal_ordinary_breakfast", "menu_ordinary"]
   },
   "rules": ["R01", "R02"],
-  "actual_result": null
+  "actual_result": {
+    "status": "PASS",
+    "run_on": "2026-10-15",
+    "command": "python tests/update_case_results.py",
+    "observed": {
+      "dish_status": "rejected",
+      "menu_status": "rejected",
+      "path": ["food_milk_whole", "dish_oat_milk", "meal_ordinary_breakfast", "menu_ordinary"],
+      "rules_fired": ["R01", "R02"]
+    }
+  }
 }
 ```
 
@@ -78,7 +103,17 @@ Mỗi ca bắt đầu từ dữ liệu gốc. `mutation` chỉ thay đổi bản
     "reason": "diet_mismatch"
   },
   "rules": ["R03", "R02"],
-  "actual_result": null
+  "actual_result": {
+    "status": "PASS",
+    "run_on": "2026-10-15",
+    "command": "python tests/update_case_results.py",
+    "observed": {
+      "status": "rejected",
+      "reasons": ["diet_mismatch"],
+      "origins": ["food_butter_unsalted", "food_egg_boiled"],
+      "rules_fired": ["R02", "R03"]
+    }
+  }
 }
 ```
 
@@ -97,7 +132,20 @@ Mỗi ca bắt đầu từ dữ liệu gốc. `mutation` chỉ thay đổi bản
     "preference_cannot_restore": true
   },
   "rules": ["R03", "R04", "R02", "R09"],
-  "actual_result": null
+  "actual_result": {
+    "status": "PASS",
+    "run_on": "2026-10-15",
+    "command": "python tests/update_case_results.py",
+    "observed": {
+      "status": "rejected",
+      "reason_codes": ["diet_mismatch", "explicit_avoid"],
+      "liked_foods": ["food_chicken_roasted"],
+      "in_ranking": false,
+      "notes": ["avoid_overrides_like [fact_0561]"],
+      "rules_fired": ["R02", "R03", "R04"],
+      "preference_cannot_restore": true
+    }
+  }
 }
 ```
 
@@ -122,7 +170,23 @@ Mỗi ca bắt đầu từ dữ liệu gốc. `mutation` chỉ thay đổi bản
     "tolerance": 0.0001
   },
   "rules": ["R06"],
-  "actual_result": null
+  "actual_result": {
+    "status": "PASS",
+    "run_on": "2026-10-15",
+    "command": "python tests/update_case_results.py",
+    "observed": {
+      "servings": 1,
+      "basis": "per_serving",
+      "nutrients_per_serving": {
+        "nutrient_energy": 439.2,
+        "nutrient_protein": 37.435,
+        "nutrient_lipid": 9.4,
+        "nutrient_carbohydrate": 49.435,
+        "nutrient_fiber": 3.9,
+        "nutrient_calcium": 70.05
+      }
+    }
+  }
 }
 ```
 
@@ -143,7 +207,17 @@ Mỗi ca bắt đầu từ dữ liệu gốc. `mutation` chỉ thay đổi bản
     }
   },
   "rules": ["R05", "R10", "R06", "R07"],
-  "actual_result": null
+  "actual_result": {
+    "status": "PASS",
+    "run_on": "2026-10-15",
+    "command": "python tests/update_case_results.py",
+    "observed": {
+      "order": ["dish_rice_chicken", "dish_chickpea_salad"],
+      "criteria": ["R07", "R09"],
+      "protein_g": {"dish_rice_chicken": 37.435, "dish_chickpea_salad": 14.514},
+      "decided_by": ["R07"]
+    }
+  }
 }
 ```
 
@@ -182,7 +256,20 @@ Mỗi ca bắt đầu từ dữ liệu gốc. `mutation` chỉ thay đổi bản
     }
   },
   "rules": ["R06", "R08", "R09", "R10"],
-  "actual_result": null
+  "actual_result": {
+    "status": "PASS",
+    "run_on": "2026-10-15",
+    "command": "python tests/update_case_results.py",
+    "observed": {
+      "fiber_order": ["dish_lentil_potato", "dish_chickpea_salad"],
+      "fiber_order_decided_by": ["R08"],
+      "calcium_order": ["dish_rice_tofu", "dish_chickpea_salad"],
+      "calcium_order_decided_by": ["R08"],
+      "preference_order": ["dish_rice_chicken", "dish_rice_tofu"],
+      "preference_order_decided_by": ["R09"],
+      "preference_scores": {"dish_rice_chicken": 1, "dish_rice_tofu": -1}
+    }
+  }
 }
 ```
 
@@ -220,7 +307,16 @@ Mỗi ca bắt đầu từ dữ liệu gốc. `mutation` chỉ thay đổi bản
     "null_not_zero": true
   },
   "rules": ["R05", "R02", "R06", "R10"],
-  "actual_result": null
+  "actual_result": {
+    "status": "PASS",
+    "run_on": "2026-10-15",
+    "command": "python tests/update_case_results.py",
+    "observed": {
+      "statuses": ["requires_review", "requires_review", "requires_review"],
+      "details": [["user_allergy_status_unknown"], ["food_allergen_unknown"], ["goal_nutrient_unknown"]],
+      "null_not_zero": true
+    }
+  }
 }
 ```
 
@@ -255,7 +351,20 @@ Mỗi ca bắt đầu từ dữ liệu gốc. `mutation` chỉ thay đổi bản
     "inference_not_started": true
   },
   "rules": [],
-  "actual_result": null
+  "actual_result": {
+    "status": "PASS",
+    "run_on": "2026-10-15",
+    "command": "python tests/update_case_results.py",
+    "observed": {
+      "mutations": [
+        "fact_0478: object_id food_rice_cooked -> food_missing",
+        "fact_0479: amount_g -> 0",
+        "thêm Not(contains_allergen(food_milk_whole, allergen_milk))"
+      ],
+      "validation_errors": [["dangling_reference"], ["non_positive_amount"], ["positive_negative_conflict"]],
+      "inference_not_started": true
+    }
+  }
 }
 ```
 
@@ -281,7 +390,18 @@ Mỗi ca bắt đầu từ dữ liệu gốc. `mutation` chỉ thay đổi bản
     "tolerance": 0.0001
   },
   "rules": ["R11", "R12", "R06"],
-  "actual_result": null
+  "actual_result": {
+    "status": "PASS",
+    "run_on": "2026-10-15",
+    "command": "python tests/update_case_results.py",
+    "observed": {
+      "energy_requirement": [2800, 2000, 1800, null],
+      "energy_target": [2800, 2000, 1300, null],
+      "unit": "kcal/ngày",
+      "menu_energy_ratio": 1.026385,
+      "rows_used": "hàng female 31–35 tuổi, cột sedentary"
+    }
+  }
 }
 ```
 
@@ -303,7 +423,21 @@ Mỗi ca bắt đầu từ dữ liệu gốc. `mutation` chỉ thay đổi bản
     "bmi_premise_contains": "19.61"
   },
   "rules": ["R13", "R02", "R10"],
-  "actual_result": null
+  "actual_result": {
+    "status": "PASS",
+    "run_on": "2026-10-15",
+    "command": "python tests/update_case_results.py",
+    "observed": {
+      "statuses": ["requires_review", "eligible_in_model", "requires_review"],
+      "details": [["bmi_below_threshold"], [], ["bmi_unknown"]],
+      "r13_premises": [
+        "58 / (172 / 100) ** 2 = 19.61",
+        "null / (158 / 100) ** 2 = null",
+        "user_an.nutrition_goal=lose_weight",
+        "user_tam.nutrition_goal=lose_weight"
+      ]
+    }
+  }
 }
 ```
 
@@ -331,7 +465,24 @@ Mỗi ca bắt đầu từ dữ liệu gốc. `mutation` chỉ thay đổi bản
     "tolerance": 0.0001
   },
   "rules": ["R06", "R12", "R14", "R10"],
-  "actual_result": null
+  "actual_result": {
+    "status": "PASS",
+    "run_on": "2026-10-15",
+    "command": "python tests/update_case_results.py",
+    "observed": {
+      "energy_target": 1300,
+      "menu_order": ["menu_milk_free", "menu_vegetarian", "menu_vegan", "menu_ordinary", "menu_vegan_peanut_free"],
+      "menu_energy_kcal": {
+        "menu_ordinary": 1438.7,
+        "menu_vegetarian": 1233.55,
+        "menu_vegan": 1199.5,
+        "menu_milk_free": 1334.3,
+        "menu_vegan_peanut_free": 1035.0
+      },
+      "menu_decided_by": ["R14", "R14", "R14", "R14"],
+      "dish_order": ["dish_fruit_plate", "dish_lentil_potato", "dish_rice_chicken"]
+    }
+  }
 }
 ```
 
@@ -354,6 +505,17 @@ Mỗi ca bắt đầu từ dữ liệu gốc. `mutation` chỉ thay đổi bản
     "vegan_excluded_groups": ["group_dairy"]
   },
   "rules": ["R09", "R15", "R10"],
-  "actual_result": null
+  "actual_result": {
+    "status": "PASS",
+    "run_on": "2026-10-15",
+    "command": "python tests/update_case_results.py",
+    "observed": {
+      "order": ["menu_vegetarian", "menu_vegan_peanut_free"],
+      "decided_by": ["R15"],
+      "coverage": {"menu_vegan_peanut_free": "5/6", "menu_vegetarian": "6/6"},
+      "vegan_coverage": {"menu_vegan_peanut_free": "5/5"},
+      "vegan_excluded_groups": ["group_dairy"]
+    }
+  }
 }
 ```
