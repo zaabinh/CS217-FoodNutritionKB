@@ -9,7 +9,7 @@ Bài thực hành 2 — Nhóm 1, môn Các hệ cơ sở tri thức (CS217.R11).
 | Đoàn Hữu Gia Bình | 24520192 | Concepts, Attributes, Facts và nguồn dữ liệu |
 | Nguyễn Thái Bảo | 24520173 | Relations, ràng buộc, sơ đồ và tích hợp báo cáo |
 | Võ Hoài Chiều | 24520220 | Mô hình biểu diễn và Rules IF–THEN |
-| Bùi Huy Chương (Karry) | 24520230 | Python nạp/kiểm tra/truy vấn, kiểm thử và đóng gói |
+| Bùi Huy Chương  | 24520230 | Python nạp/kiểm tra/truy vấn, kiểm thử và đóng gói |
 
 ## Mô hình và các tệp
 

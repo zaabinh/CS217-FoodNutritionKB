@@ -1,6 +1,6 @@
 # Mô hình biểu diễn tri thức (Bước 3)
 
-> **Ghi chú phân công:** theo README, "Mô hình biểu diễn và Rules IF–THEN" là phần của Võ Hoài Chiều. Tài liệu này do Bùi Huy Chương (Karry) viết để hỗ trợ, tổng hợp từ các tệp đã có ([concepts.md](concepts.md), [relations.md](relations.md), [rules.md](rules.md), `kb/*.json`), **cần Chiều duyệt**. Các luật cơ bản do Chiều đặc tả; R10–R14 do Karry bổ sung trong TH2, cần nhóm duyệt.
+> **Ghi chú phân công:** theo README, "Mô hình biểu diễn và Rules IF–THEN" là phần của Võ Hoài Chiều. Tài liệu này do Bùi Huy Chương viết để hỗ trợ, tổng hợp từ các tệp đã có ([concepts.md](concepts.md), [relations.md](relations.md), [rules.md](rules.md), `kb/*.json`), **cần Chiều duyệt**. Các luật cơ bản do Chiều đặc tả; R10–R14 do Chương bổ sung trong TH2, cần nhóm duyệt.
 
 > Hệ thống chỉ mang tính tham khảo trong phạm vi tri thức đã mô hình hóa, không thay thế tư vấn của bác sĩ hoặc chuyên gia dinh dưỡng.
 
