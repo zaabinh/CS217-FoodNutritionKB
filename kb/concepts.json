@@ -15,7 +15,7 @@
         {"name": "diet_status", "type": "string", "required": true, "enum": ["complete", "unknown"]}
       ],
       "example_id": "food_rice_cooked",
-      "related_rule_ids": ["R01", "R02", "R03", "R04", "R05", "R06", "R07", "R08", "R09", "R10", "R13", "R14", "R15"],
+      "related_rule_ids": ["R01", "R02", "R03", "R04", "R05", "R06", "R07", "R08", "R09", "R12", "R13", "R14"],
       "_meta": {
         "source_ids": ["source_th1", "source_th2", "source_design"]
       }
@@ -32,7 +32,7 @@
         {"name": "criterion", "type": "string", "required": true}
       ],
       "example_id": "group_starch",
-      "related_rule_ids": ["R15"],
+      "related_rule_ids": ["R14"],
       "_meta": {
         "source_ids": ["source_th1", "source_th2", "source_design"]
       }
@@ -50,7 +50,7 @@
         {"name": "usda_nutrient_id", "type": "integer", "required": true, "minimum": 1}
       ],
       "example_id": "nutrient_protein",
-      "related_rule_ids": ["R06", "R07", "R08", "R12", "R14"],
+      "related_rule_ids": ["R06", "R07", "R11", "R13"],
       "_meta": {
         "source_ids": ["source_th1", "source_th2", "source_design"]
       }
@@ -70,7 +70,7 @@
         {"name": "source_record_id", "type": ["string", "null"], "required": true}
       ],
       "example_id": "nc_rice_cooked_protein",
-      "related_rule_ids": ["R05", "R06", "R07", "R08"],
+      "related_rule_ids": ["R05", "R06", "R07"],
       "_meta": {
         "source_ids": ["source_th1", "source_th2", "source_design"]
       }
@@ -87,7 +87,7 @@
         {"name": "description", "type": "string", "required": true}
       ],
       "example_id": "allergen_milk",
-      "related_rule_ids": ["R01", "R15"],
+      "related_rule_ids": ["R01", "R14"],
       "_meta": {
         "source_ids": ["source_th1", "source_th2", "source_design"]
       }
@@ -105,7 +105,7 @@
         {"name": "recipe_status", "type": "string", "required": true, "enum": ["complete", "unknown"]}
       ],
       "example_id": "dish_rice_chicken",
-      "related_rule_ids": ["R02", "R05", "R06", "R07", "R08", "R09", "R10", "R13", "R14"],
+      "related_rule_ids": ["R02", "R05", "R06", "R07", "R08", "R09", "R12", "R13"],
       "_meta": {
         "source_ids": ["source_th1", "source_th2", "source_design"]
       }
@@ -122,7 +122,7 @@
         {"name": "meal_type", "type": "string", "required": true, "enum": ["breakfast", "lunch", "dinner"]}
       ],
       "example_id": "meal_ordinary_breakfast",
-      "related_rule_ids": ["R02", "R06", "R07", "R08", "R09", "R10", "R13", "R14"],
+      "related_rule_ids": ["R02", "R06", "R07", "R08", "R09", "R12", "R13"],
       "_meta": {
         "source_ids": ["source_th1", "source_th2", "source_design"]
       }
@@ -139,7 +139,7 @@
         {"name": "scope", "type": "string", "required": true, "const": "one_day"}
       ],
       "example_id": "menu_ordinary",
-      "related_rule_ids": ["R02", "R06", "R07", "R08", "R09", "R10", "R12", "R13", "R14", "R15"],
+      "related_rule_ids": ["R02", "R06", "R07", "R08", "R09", "R11", "R12", "R13", "R14"],
       "_meta": {
         "source_ids": ["source_th1", "source_th2", "source_design"]
       }
@@ -159,7 +159,7 @@
         {"name": "avoid_status", "type": "string", "required": true, "enum": ["complete", "unknown"]}
       ],
       "example_id": "user_minh",
-      "related_rule_ids": ["R01", "R03", "R04", "R05", "R07", "R08", "R09", "R10", "R11", "R12", "R13", "R14", "R15"],
+      "related_rule_ids": ["R01", "R03", "R04", "R05", "R07", "R08", "R09", "R10", "R11", "R12", "R13", "R14"],
       "_meta": {
         "source_ids": ["source_th1", "source_th2", "source_design"]
       }
@@ -177,7 +177,7 @@
         {"name": "policy_status", "type": "string", "required": true, "enum": ["complete", "unknown"]}
       ],
       "example_id": "diet_vegan",
-      "related_rule_ids": ["R03", "R05", "R15"],
+      "related_rule_ids": ["R03", "R05", "R14"],
       "_meta": {
         "source_ids": ["source_th1", "source_th2", "source_design"]
       }

@@ -162,8 +162,59 @@ class ConflictsAndRanking(unittest.TestCase):
         self.assertEqual(ranking["basis"], "per_100g")
 
 
+
+class GeneralizedNutrientGoal(unittest.TestCase):
+    """R07 dùng chung ánh xạ mục tiêu/chất; không còn nhánh luật riêng cho chất xơ/canxi."""
+
+    def test_three_nutrient_goals_are_decided_by_r07(self):
+        cases = [
+            ("prefer_protein", "user_minh", "dish_rice_chicken", "dish_chickpea_salad", "nutrient_protein"),
+            ("prefer_fiber", "user_lan", "dish_lentil_potato", "dish_chickpea_salad", "nutrient_fiber"),
+            ("prefer_calcium", "user_minh", "dish_rice_tofu", "dish_chickpea_salad", "nutrient_calcium"),
+        ]
+        for goal, uid, higher, lower, nutrient in cases:
+            with self.subTest(goal=goal):
+                raw = base_raw()
+                set_user_goal(raw, uid, goal)
+                self.assertNotIn("R15", {r["id"] for r in raw["rules"]["rules"]})
+                eng = engine_for(raw)
+                ranking = eng.rank(eng.infer(uid), [lower, higher])
+                self.assertEqual(ranking["order"], [higher, lower])
+                self.assertEqual(ranking["criteria"], ["R07", "R08"])
+                self.assertEqual(ranking["decisions"][0]["rule_id"], "R07")
+                self.assertEqual(ranking["scores"][higher]["R07"]["nutrient"], nutrient)
+
+    def test_each_goal_blocks_unknown_target_nutrient(self):
+        for goal, suffix in [("prefer_protein", "protein"), ("prefer_fiber", "fiber"), ("prefer_calcium", "calcium")]:
+            with self.subTest(goal=goal):
+                raw = base_raw()
+                set_user_goal(raw, "user_minh", goal)
+                nc = next(n for n in raw["facts"]["entities"]["nutrient_content"]
+                          if n["id"] == "nc_rice_cooked_" + suffix)
+                nc.update(status="unknown", value=None, source_record_id=None)
+                eng = engine_for(raw)
+                res = eng.infer("user_minh")
+                self.assertEqual(res.status("dish_rice_chicken"), REVIEW)
+                self.assertIn("goal_nutrient_unknown", res.details("dish_rice_chicken"))
+                self.assertNotIn("dish_rice_chicken", eng.rank(res, concept="dish")["order"])
+
+    def test_new_nutrient_goal_only_needs_json_configuration(self):
+        raw = base_raw()
+        profile = next(c for c in raw["concepts"]["concepts"] if c["id"] == "user_profile")
+        goal = next(a for a in profile["attributes"] if a["name"] == "nutrition_goal")
+        goal["enum"].append("prefer_lipid")
+        r07 = next(r for r in raw["rules"]["rules"] if r["id"] == "R07")
+        r07["exec"]["then"]["goals"]["prefer_lipid"] = {"nutrient": "nutrient_lipid", "direction": "desc"}
+        set_user_goal(raw, "user_minh", "prefer_lipid")
+        eng = engine_for(raw)
+        ranking = eng.rank(eng.infer("user_minh"), ["food_rice_cooked", "food_olive_oil"])
+        self.assertEqual(ranking["order"], ["food_olive_oil", "food_rice_cooked"])
+        self.assertEqual(ranking["decisions"][0]["rule_id"], "R07")
+        self.assertEqual(ranking["scores"]["food_olive_oil"]["R07"]["nutrient"], "nutrient_lipid")
+
+
 class EnergyAndWeightGoal(unittest.TestCase):
-    """R11–R15: năng lượng, giảm cân an toàn, cân bằng nhóm."""
+    """R10–R14: năng lượng, giảm cân an toàn, cân bằng nhóm."""
 
     def _values(self, **context):
         raw = base_raw()
@@ -178,7 +229,7 @@ class EnergyAndWeightGoal(unittest.TestCase):
 
     def test_every_adult_age_sex_activity_has_a_value(self):
         raw = base_raw()
-        rule = next(r for r in raw["rules"]["rules"] if r["id"] == "R11")
+        rule = next(r for r in raw["rules"]["rules"] if r["id"] == "R10")
         rows = rule["exec"]["then"]["rows"]
         for sex in ("male", "female"):
             for age in range(18, 101):
@@ -222,13 +273,13 @@ class EnergyAndWeightGoal(unittest.TestCase):
         eng = engine_for(base_raw())
         ranking = eng.rank(eng.infer("user_minh"), concept="menu")
         for scores in ranking["scores"].values():
-            self.assertEqual(scores["R15"]["required"], 5)
-            self.assertEqual(scores["R15"]["excluded"][0]["group"], "group_dairy")
+            self.assertEqual(scores["R14"]["required"], 5)
+            self.assertEqual(scores["R14"]["excluded"][0]["group"], "group_dairy")
 
     def test_group_coverage_only_for_menus(self):
         eng = engine_for(base_raw())
         ranking = eng.rank(eng.infer("user_huy"), concept="dish")
-        self.assertNotIn("R15", ranking["criteria"])
+        self.assertNotIn("R14", ranking["criteria"])
 
 
 class Extensibility(unittest.TestCase):

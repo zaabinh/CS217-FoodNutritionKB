@@ -209,7 +209,7 @@ def main(argv=None) -> int:
                              ensure_ascii=False, indent=2))
         else:
             lines = explain_nutrients(res, args.item_id)
-            _print(lines if args.user else [line for line in lines if "R12" not in line])
+            _print(lines if args.user else [line for line in lines if "R11" not in line])
         return 0
 
     _require(kb, args.user_id, ["user_profile"])

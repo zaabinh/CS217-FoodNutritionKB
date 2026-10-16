@@ -213,40 +213,12 @@
     },
     {
       "id": "R07",
-      "name": "Ưu tiên protein theo mục tiêu",
+      "name": "Ưu tiên theo chất dinh dưỡng mục tiêu",
       "phase": "ranking",
       "priority": 20,
       "kind": "soft",
-      "if_all": ["u.nutrition_goal=prefer_protein", "R10 cho phép hai ứng viên cùng concept và cùng cơ sở so sánh tương ứng", "protein(x)>protein(y), các giá trị known"],
-      "then": {
-        "action": "prefer_candidate",
-        "preferred": "x",
-        "over": "y",
-        "reason": "higher_protein_at_same_basis"
-      },
-      "concept_ids": ["user_profile", "food", "dish", "meal", "menu", "nutrient", "nutrient_content"],
-      "relation_names": ["has_nutrient_content", "measures_nutrient", "uses_ingredient", "contains_dish", "contains_meal"],
-      "source_ids": ["source_th1", "source_design"],
-      "exec": {
-        "then": {
-          "action": "goal_metric",
-          "goals": {"prefer_protein": {"nutrient": "nutrient_protein", "direction": "desc"}}
-        }
-      }
-    },
-    {
-      "id": "R08",
-      "name": "Ưu tiên chất xơ hoặc canxi theo mục tiêu",
-      "phase": "ranking",
-      "priority": 20,
-      "kind": "soft",
-      "if_all": ["u.nutrition_goal thuộc prefer_fiber/prefer_calcium", "R10 cho phép hai ứng viên cùng cấp; metric là fiber/calcium tương ứng", "metric(x)>metric(y), các giá trị known"],
-      "then": {
-        "action": "prefer_candidate",
-        "preferred": "x",
-        "over": "y",
-        "reason": "higher_selected_nutrient_at_same_basis"
-      },
+      "if_all": ["u.nutrition_goal ánh xạ tới chất dinh dưỡng n trong exec.then.goals", "R09 cho phép hai ứng viên x, y cùng concept và cùng cơ sở so sánh tương ứng", "N(x,n) và N(y,n) đều known; N(x,n)>N(y,n)"],
+      "then": {"action": "prefer_candidate", "preferred": "x", "over": "y", "reason": "higher_selected_nutrient_at_same_basis"},
       "concept_ids": ["user_profile", "food", "dish", "meal", "menu", "nutrient", "nutrient_content"],
       "relation_names": ["has_nutrient_content", "measures_nutrient", "uses_ingredient", "contains_dish", "contains_meal"],
       "source_ids": ["source_th1", "source_design"],
@@ -254,6 +226,7 @@
         "then": {
           "action": "goal_metric",
           "goals": {
+            "prefer_protein": {"nutrient": "nutrient_protein", "direction": "desc"},
             "prefer_fiber": {"nutrient": "nutrient_fiber", "direction": "desc"},
             "prefer_calcium": {"nutrient": "nutrient_calcium", "direction": "desc"}
           }
@@ -261,12 +234,12 @@
       }
     },
     {
-      "id": "R09",
+      "id": "R08",
       "name": "Xếp hạng theo sở thích sau mục tiêu",
       "phase": "ranking",
       "priority": 10,
       "kind": "soft",
-      "if_all": ["Ứng viên đã eligible theo R10", "Xét các food xuất hiện trong ứng viên; không đếm một food hai lần"],
+      "if_all": ["Ứng viên đã eligible theo R09", "Xét các food xuất hiện trong ứng viên; không đếm một food hai lần"],
       "then": {
         "action": "calculate_preference_score",
         "formula": "Σ (+1 nếu like; -1 nếu dislike; 0 nếu chưa khai báo)",
@@ -287,7 +260,7 @@
       }
     },
     {
-      "id": "R10",
+      "id": "R09",
       "name": "Xác nhận eligible trong phạm vi mô hình",
       "phase": "eligibility",
       "priority": 80,
@@ -298,7 +271,7 @@
         "target": "candidate for user u",
         "value": "eligible_in_model",
         "reason": "all_required_checks_passed",
-        "final_order": "Metric mục tiêu giảm dần, rồi preference_score giảm dần, rồi độ phủ nhóm thực phẩm (R15, chỉ Menu) giảm dần, rồi ID tăng dần."
+        "final_order": "Metric mục tiêu giảm dần, rồi preference_score giảm dần, rồi độ phủ nhóm thực phẩm (R14, chỉ Menu) giảm dần, rồi ID tăng dần."
       },
       "concept_ids": ["user_profile", "food", "dish", "meal", "menu"],
       "relation_names": ["uses_ingredient", "contains_dish", "contains_meal", "follows_diet", "compatible_with_diet"],
@@ -314,7 +287,7 @@
       }
     },
     {
-      "id": "R11",
+      "id": "R10",
       "name": "Ước tính nhu cầu năng lượng theo tuổi, giới và mức vận động",
       "phase": "aggregation",
       "priority": 65,
@@ -379,17 +352,17 @@
       }
     },
     {
-      "id": "R12",
+      "id": "R11",
       "name": "Mục tiêu năng lượng mỗi ngày và tỷ lệ đáp ứng của thực đơn",
       "phase": "aggregation",
       "priority": 60,
       "kind": "calculation",
-      "if_all": ["R11 đã cho energy_requirement(u)", "Nếu u.nutrition_goal = lose_weight thì đã biết giới tính để chọn mức sàn"],
+      "if_all": ["R10 đã cho energy_requirement(u)", "Nếu u.nutrition_goal = lose_weight thì đã biết giới tính để chọn mức sàn"],
       "then": {
         "action": "calculate_energy_target",
         "target": "user u và từng menu",
         "formula": "lose_weight: energy_target = max(energy_requirement − 500, 1200 nếu nữ / 1500 nếu nam); mục tiêu khác: energy_target = energy_requirement. Menu: energy_ratio = năng lượng Menu (R06) / energy_target.",
-        "use": "Chỉ hiển thị và dùng cho R14; không đổi trạng thái ứng viên. Không thay thế chỉ định của chuyên gia."
+        "use": "Chỉ hiển thị và dùng cho R13; không đổi trạng thái ứng viên. Không thay thế chỉ định của chuyên gia."
       },
       "concept_ids": ["user_profile", "menu", "nutrient"],
       "relation_names": ["has_nutrient_content", "measures_nutrient", "uses_ingredient", "contains_dish", "contains_meal"],
@@ -406,7 +379,7 @@
       }
     },
     {
-      "id": "R13",
+      "id": "R12",
       "name": "Chặn mục tiêu giảm cân khi chưa xác nhận thừa cân",
       "phase": "hard_constraints",
       "priority": 90,
@@ -459,15 +432,15 @@
       }
     },
     {
-      "id": "R14",
+      "id": "R13",
       "name": "Ưu tiên năng lượng phù hợp mục tiêu giảm cân",
       "phase": "ranking",
       "priority": 20,
       "kind": "soft",
-      "if_all": ["u.nutrition_goal = lose_weight", "R10 cho phép hai ứng viên cùng concept và cùng cơ sở so sánh tương ứng", "Năng lượng của các ứng viên đều known"],
+      "if_all": ["u.nutrition_goal = lose_weight", "R09 cho phép hai ứng viên cùng concept và cùng cơ sở so sánh tương ứng", "Năng lượng của các ứng viên đều known"],
       "then": {
         "action": "prefer_candidate",
-        "preferred": "Menu: |năng lượng − energy_target (R12)| nhỏ hơn; Food/Dish/Meal: năng lượng thấp hơn ở cùng cơ sở",
+        "preferred": "Menu: |năng lượng − energy_target (R11)| nhỏ hơn; Food/Dish/Meal: năng lượng thấp hơn ở cùng cơ sở",
         "reason": "energy_closer_to_target / lower_energy_at_same_basis"
       },
       "concept_ids": ["user_profile", "food", "dish", "meal", "menu", "nutrient", "nutrient_content"],
@@ -487,12 +460,12 @@
       }
     },
     {
-      "id": "R15",
+      "id": "R14",
       "name": "Ưu tiên thực đơn cân bằng nhóm thực phẩm",
       "phase": "ranking",
       "priority": 5,
       "kind": "soft",
-      "if_all": ["Hai Menu đều eligible theo R10", "Đồng hạng theo mục tiêu (R07/R08/R14) và sở thích (R09)"],
+      "if_all": ["Hai Menu đều eligible theo R09", "Đồng hạng theo mục tiêu (R07/R13) và sở thích (R08)"],
       "then": {
         "action": "prefer_candidate",
         "preferred": "Menu phủ nhiều nhóm hơn trong 6 nhóm của bài (tương ứng 6 thành phần cốt lõi của DGA)",

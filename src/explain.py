@@ -135,7 +135,7 @@ def explain_nutrients(res, item: str) -> list[str]:
         lines.append(f"  thành phần: {', '.join(parts)}")
     ratio = res.item_values.get(item, {}).get("energy_ratio")
     if ratio is not None:
-        lines.append(f"  đáp ứng {ratio * 100:.0f}% mục tiêu năng lượng ước tính của {res.user_id} (R12)")
+        lines.append(f"  đáp ứng {ratio * 100:.0f}% mục tiêu năng lượng ước tính của {res.user_id} (R11)")
     return lines
 
 
@@ -182,7 +182,7 @@ def explain_ranking(kb: KnowledgeBase, ranking: dict, res=None, top: int | None 
         if res is not None:
             ratio = res.item_values.get(item, {}).get("energy_ratio")
             if ratio is not None:
-                lines.append(f"       năng lượng đáp ứng {ratio * 100:.0f}% mục tiêu ước tính (R12)")
+                lines.append(f"       năng lượng đáp ứng {ratio * 100:.0f}% mục tiêu ước tính (R11)")
     for d in ranking["decisions"][: (len(order) - 1 if top else None)]:
         if d.get("tie"):
             lines.append(f"  - {d['higher']} trước {d['lower']}: đồng hạng mọi tiêu chí, xếp theo ID ({d['rule_id']})")

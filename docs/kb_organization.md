@@ -7,7 +7,7 @@ Tài liệu này mô tả cách CSTT của đề tài được lưu, nạp, ki�
 ## 1. Nguyên tắc tổ chức
 
 - **Cơ sở tri thức** (dữ liệu + luật) nằm hoàn toàn trong `kb/*.json`. **Bộ máy suy diễn** (`src/*.py`) không chứa tên thực phẩm, tác nhân dị ứng, ngưỡng hay công thức nào của miền; mọi thứ đó được đọc từ JSON.
-- Mỗi luật R01–R15 có hai phần trong cùng một bản ghi của `rules.json`: phần đặc tả cho người đọc (`if_all`/`if_any`/`then`, nguồn) và phần thực thi `exec` cho máy. Thêm luật cùng loại chỉ cần thêm JSON.
+- Mỗi luật đang dùng (R01–R14) có hai phần trong cùng một bản ghi của `rules.json`: phần đặc tả cho người đọc (`if_all`/`if_any`/`then`, nguồn) và phần thực thi `exec` cho máy. Thêm luật cùng loại chỉ cần thêm JSON.
 - Chỉ dùng thư viện chuẩn Python (đã chạy trên Python 3.10), nên chạy được trên máy sạch không cần cài thêm gì.
 
 ## 2. Cấu trúc thư mục
@@ -18,7 +18,7 @@ CS217-FoodNutritionKB/
 │   ├── concepts.json           10 Concepts và Attributes (kiểu, enum, ràng buộc)
 │   ├── relations.json          12 Relations: domain/range, bội số, thuộc tính cạnh, chính sách phủ định
 │   ├── facts.json              thực thể, 572 cạnh khẳng định, 11 cạnh phủ định, 15 nguồn
-│   └── rules.json              15 luật (đặc tả + exec), evaluation_plan, status_order, comparison_basis
+│   └── rules.json              14 luật (đặc tả + exec), evaluation_plan, status_order, comparison_basis
 ├── src/                        BỘ MÁY SUY DIỄN VÀ CÔNG CỤ
 │   ├── kb_loader.py            nạp 4 JSON, đánh chỉ mục, truy vấn quan hệ 3 giá trị
 │   ├── rule_dsl.py             đặc tả ngôn ngữ exec, bộ tính biểu thức an toàn, kiểm tra cấu trúc luật
@@ -84,18 +84,18 @@ Hàm lượng dinh dưỡng là thực thể `nutrient_content` (giá trị trê
 | `{"rel": R, "args": [s, o], "truth": "true\|false\|unknown", "where": {...}}` | quan hệ R với giá trị chân lý 3 giá trị (mục 4); `where` lọc thuộc tính cạnh |
 | `{"each": concept, "var": "?x"}` | duyệt mọi thực thể của concept |
 | `{"attr": "?x.a.b", "op": OP, "value": V}` | so sánh thuộc tính; OP ∈ eq, ne, in, not_in, lt, le, gt, ge, missing, present |
-| `{"expr": "biểu thức", "op": OP, "value": V}` | biểu thức số học trên thuộc tính (ví dụ BMI ở R13); thiếu dữ liệu thì giá trị là null |
+| `{"expr": "biểu thức", "op": OP, "value": V}` | biểu thức số học trên thuộc tính (ví dụ BMI ở R12); thiếu dữ liệu thì giá trị là null |
 | `{"goal_nutrient": ["?u", "?n"]}` | chất dinh dưỡng mục tiêu của u, lấy từ các luật xếp hạng `goal_metric` |
 | `{"nutrient_value": ["?f", "?n"], "truth": "known\|unknown"}` | hàm lượng đã biết hay chưa |
 | `{"status": "?x", "value": S}` | trạng thái đã suy ra (cho phép luật phụ thuộc kết luận khác; engine lặp tới điểm cố định) |
 
 | Hành động (`then.action`) | Pha | Dùng ở |
 |---|---|---|
-| `set_status`, `set_status_unless_rejected` | hard_constraints | R01, R03, R04, R05, R13 |
+| `set_status`, `set_status_unless_rejected` | hard_constraints | R01, R03, R04, R05, R12 |
 | `propagate_status` | propagation | R02 |
-| `aggregate_nutrients`, `lookup_table`, `energy_target` | aggregation | R06, R11, R12 |
-| `set_eligible` | eligibility | R10 |
-| `goal_metric`, `preference_score`, `group_coverage` | ranking | R07, R08, R14, R09, R15 |
+| `aggregate_nutrients`, `lookup_table`, `energy_target` | aggregation | R06, R10, R11 |
+| `set_eligible` | eligibility | R09 |
+| `goal_metric`, `preference_score`, `group_coverage` | ranking | R07, R13, R08, R14 |
 
 `rule_dsl.check_exec` kiểm tra cấu trúc này (quan hệ, concept, hằng là ID có thật, biến đích đã được gán, hành động đúng pha...) như một phần của `validate_kb`.
 
@@ -106,17 +106,17 @@ flowchart LR
   A["kb/*.json"] --> B["kb_loader: nạp + chỉ mục"]
   B --> C{"validate_kb"}
   C -- "có lỗi" --> X["Dừng: KBValidationError, không suy diễn"]
-  C -- "hợp lệ" --> D["hard_constraints + propagation<br/>R01 R03 R04 R05 R13 + R02<br/>lặp tới điểm cố định"]
-  D --> E["aggregation<br/>R06 R11 R12"]
-  E --> F["eligibility<br/>R10"]
-  F --> G["ranking khi truy vấn<br/>R07 R08 R14 → R09 → R15 → ID"]
+  C -- "hợp lệ" --> D["hard_constraints + propagation<br/>R01 R03 R04 R05 R12 + R02<br/>lặp tới điểm cố định"]
+  D --> E["aggregation<br/>R06 R10 R11"]
+  E --> F["eligibility<br/>R09"]
+  F --> G["ranking khi truy vấn<br/>R07 R13 → R08 → R14 → ID"]
   G --> H["explain: luật + Facts + đường lan truyền"]
 ```
 
 - Thứ tự pha đọc từ `rules.json#evaluation_plan`; trong một pha, luật priority cao chạy trước, cùng priority thì theo mã luật.
 - **Quan hệ 3 giá trị** (`KnowledgeBase.holds`): có cạnh khẳng định → `true`; có cạnh phủ định → `false`; không có cạnh mà thuộc tính `status_attribute` của subject là `complete` → `false`; ngược lại → `unknown`. Quan hệ không khai báo `negative_rules` (khai báo của người dùng) dùng thế giới đóng; trạng thái `unknown` của hồ sơ do R05 xử lý.
 - **Trạng thái**: `rejected` > `requires_review` > `eligible_in_model`. Mọi lý do đều được giữ (ví dụ TC05 có cả `diet_mismatch` và `explicit_avoid`); trạng thái cuối là lý do nặng nhất, nên sở thích không bao giờ gỡ được lệnh loại.
-- **Xếp hạng** chỉ so ứng viên eligible cùng concept và cùng cơ sở (`comparison_basis`: Food/100 g, Dish/khẩu phần, Meal/cả bữa, Menu/một ngày), theo thứ tự priority của các luật pha ranking, cuối cùng theo ID tăng dần (R10).
+- **Xếp hạng** chỉ so ứng viên eligible cùng concept và cùng cơ sở (`comparison_basis`: Food/100 g, Dish/khẩu phần, Meal/cả bữa, Menu/một ngày), theo thứ tự priority của các luật pha ranking, cuối cùng theo ID tăng dần (R09).
 
 ## 5. Cơ chế giải thích
 
@@ -141,7 +141,7 @@ dish_rice_chicken — Cơm, ức gà và bông cải [dish] với user_quang: B�
   Luật đã kích hoạt cho dish_rice_chicken: R02, R03, R04
 ```
 
-Kết quả xếp hạng cũng nêu luật quyết định từng cặp liền kề, ví dụ `menu_vegetarian trước menu_vegan_peanut_free do R15: phủ 6/6 nhóm so với phủ 5/6 nhóm, thiếu group_dairy`. Thêm `--json` để lấy toàn bộ cấu trúc giải thích dạng máy đọc được.
+Kết quả xếp hạng cũng nêu luật quyết định từng cặp liền kề, ví dụ `menu_vegetarian trước menu_vegan_peanut_free do R14: phủ 6/6 nhóm so với phủ 5/6 nhóm, thiếu group_dairy`. Thêm `--json` để lấy toàn bộ cấu trúc giải thích dạng máy đọc được.
 
 ## 6. Kiểm tra tính hợp lệ (`validate_kb.py`)
 
@@ -167,19 +167,19 @@ Engine gọi validator trước khi suy diễn và từ chối chạy nếu còn
 
 **Thêm món / bữa / thực đơn**: thêm `dish` + cạnh `uses_ingredient` (`amount_g`, `unit: g`, `quantity_basis: recipe_total`); `meal` + `contains_dish` (`servings`); `menu` + đúng 3 `contains_meal` (sáng/trưa/tối).
 
-**Thêm hồ sơ người dùng**: thêm `user_profile` và đúng một cạnh `follows_diet`; dị ứng (`allergic_to`), cần tránh (`avoids_food`), sở thích (`prefers_food`) tùy chọn. Nếu chưa hỏi đủ dị ứng thì để `allergy_status: unknown`; hệ thống sẽ không kết luận đủ điều kiện (R05). Mục tiêu `lose_weight` cần `weight_kg` và `height_cm` (R13).
+**Thêm hồ sơ người dùng**: thêm `user_profile` và đúng một cạnh `follows_diet`; dị ứng (`allergic_to`), cần tránh (`avoids_food`), sở thích (`prefers_food`) tùy chọn. Nếu chưa hỏi đủ dị ứng thì để `allergy_status: unknown`; hệ thống sẽ không kết luận đủ điều kiện (R05). Mục tiêu `lose_weight` cần `weight_kg` và `height_cm` (R12).
 
 **Thêm luật mới bằng JSON** (không sửa engine), ví dụ loại cả một nhóm thực phẩm:
 
 ```json
-{"id": "R16", "name": "Loại thực phẩm thuộc nhóm chất béo", "phase": "hard_constraints", "priority": 100,
+{"id": "R15", "name": "Loại thực phẩm thuộc nhóm chất béo", "phase": "hard_constraints", "priority": 100,
  "kind": "hard", "if_all": ["belongs_to_group(f, group_fats_oils)"], "then": {"action": "set_status"},
  "concept_ids": ["food", "food_group"], "relation_names": ["belongs_to_group"], "source_ids": ["source_design"],
  "exec": {"when": [{"rel": "belongs_to_group", "args": ["?f", "group_fats_oils"]}],
           "then": {"action": "set_status", "target": "?f", "value": "rejected", "reason": "group_excluded"}}}
 ```
 
-Luật này đã được thử trong `tests/test_engine.py` (`Extensibility`): R02 tự lan truyền lên các món có dầu ô liu mà không cần sửa mã. Tương tự, đổi tham số chỉ cần sửa JSON: ngưỡng BMI của R13 (`"value": 25`), mức thâm hụt hoặc sàn năng lượng của R12, bảng của R11, nhóm cần phủ của R15. Chỉ khi cần **loại hành động mới** (khác các hành động ở mục 3.4) mới phải thêm một hàm xử lý trong `engine.py` và khai báo nó trong `rule_dsl.ACTIONS`.
+Luật này đã được thử trong `tests/test_engine.py` (`Extensibility`): R02 tự lan truyền lên các món có dầu ô liu mà không cần sửa mã. Tương tự, đổi tham số chỉ cần sửa JSON: ngưỡng BMI của R12 (`"value": 25`), mức thâm hụt hoặc sàn năng lượng của R11, bảng của R10, nhóm cần phủ của R14. Chỉ khi cần **loại hành động mới** (khác các hành động ở mục 3.4) mới phải thêm một hàm xử lý trong `engine.py` và khai báo nó trong `rule_dsl.ACTIONS`.
 
 ## 8. Cách chạy
 
@@ -195,7 +195,7 @@ python src/demo_queries.py nutrients dish_rice_chicken
 python src/demo_queries.py recommend user_an --level menu      # --level food|dish|meal|menu, --top N
 python src/demo_queries.py compare user_minh dish_rice_chicken dish_chickpea_salad
 python src/demo_queries.py rules
-python -m unittest discover -s tests         # 65 test (hoặc: python -m pytest tests)
+python -m unittest discover -s tests         # 68 test (hoặc: python -m pytest tests)
 python tests/update_case_results.py          # chạy 14 TC và ghi actual_result vào test_cases.md
 python src/package_kb.py                     # tạo dist/CS217_TH2_Nhom1_KnowledgeBase.zip kèm bằng chứng
 ```
@@ -203,6 +203,6 @@ python src/package_kb.py                     # tạo dist/CS217_TH2_Nhom1_Knowle
 ## 9. Giới hạn
 
 - `eligible_in_model` chỉ nghĩa là đạt các ràng buộc đã mô hình hóa (5 tác nhân dị ứng, 3 chế độ ăn, danh sách tránh); chưa xét nhãn sản phẩm, nhiễm chéo hay bệnh lý.
-- R11 dùng bảng ước tính theo tuổi/giới/mức vận động của DGA 2020–2025, áp cho người trưởng thành không mang thai/cho con bú; ánh xạ `low/moderate/high` sang `Sedentary/Moderately Active/Active` là quyết định của nhóm. R12–R14 chỉ xếp hạng các thực đơn mẫu, không phải phác đồ giảm cân; R13 chuyển mọi hồ sơ giảm cân chưa xác nhận thừa cân (BMI ≥ 25) sang "cần xem xét".
-- Các thực đơn mẫu chỉ cung cấp khoảng 1035–1439 kcal/ngày, thấp hơn nhu cầu ước tính của đa số hồ sơ (R12 hiển thị tỷ lệ đáp ứng); chúng minh họa cấu trúc, không phải thực đơn khuyến nghị.
+- R10 dùng bảng ước tính theo tuổi/giới/mức vận động của DGA 2020–2025, áp cho người trưởng thành không mang thai/cho con bú; ánh xạ `low/moderate/high` sang `Sedentary/Moderately Active/Active` là quyết định của nhóm. R11–R13 chỉ xếp hạng các thực đơn mẫu, không phải phác đồ giảm cân; R12 chuyển mọi hồ sơ giảm cân chưa xác nhận thừa cân (BMI ≥ 25) sang "cần xem xét".
+- Các thực đơn mẫu chỉ cung cấp khoảng 1035–1439 kcal/ngày, thấp hơn nhu cầu ước tính của đa số hồ sơ (R11 hiển thị tỷ lệ đáp ứng); chúng minh họa cấu trúc, không phải thực đơn khuyến nghị.
 - Nhóm thực phẩm của bài là thiết kế riêng: khoai tây thuộc `group_starch` và bơ quả thuộc `group_fruits`, trong khi DGA xếp hai loại này vào rau; bơ sữa nằm trong `group_fats_oils`.

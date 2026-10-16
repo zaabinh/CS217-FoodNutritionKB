@@ -1,8 +1,8 @@
 # Test cases
 
-14 ca dưới đây bao phủ truy vấn, R01–R15, thiếu dữ liệu và ngoại lệ (TC11–TC14 bổ sung cho R11–R15). `input` là đầu vào; `expected` là kết quả cần đạt; `rules` là các luật liên quan; `actual_result` sẽ được điền sau khi chạy.
+14 ca dưới đây bao phủ truy vấn, các luật đang dùng R01–R14, thiếu dữ liệu và ngoại lệ (TC11–TC14 bổ sung cho R10–R14). `input` là đầu vào; `expected` là kết quả cần đạt; `rules` là các luật liên quan; `actual_result` sẽ được điền sau khi chạy.
 
-**Trạng thái chung: đã thực thi ngày 2026-10-15 — 14/14 PASS.** `actual_result` do `python tests/update_case_results.py` ghi tự động từ kết quả chương trình, không chép tay; `python -m unittest discover -s tests` chạy lại cùng các ca này.
+**Trạng thái chung: đã thực thi ngày 2026-10-16 — 14/14 PASS.** `actual_result` do `python tests/update_case_results.py` ghi tự động từ kết quả chương trình, không chép tay; `python -m unittest discover -s tests` chạy lại cùng các ca này.
 
 Mỗi ca bắt đầu từ dữ liệu gốc. `mutation` chỉ thay đổi bản sao dữ liệu trong bộ nhớ cho ca đó; TC10 áp dụng từng thay đổi riêng, không sửa Facts gốc. `override_goal` thay mục tiêu trên bản sao hồ sơ; `override_context` gán và `remove_context` xóa trường trong `context` của bản sao hồ sơ.
 
@@ -23,7 +23,7 @@ Mỗi ca bắt đầu từ dữ liệu gốc. `mutation` chỉ thay đổi bản
   "rules": [],
   "actual_result": {
     "status": "PASS",
-    "run_on": "2026-10-15",
+    "run_on": "2026-10-16",
     "command": "python tests/update_case_results.py",
     "observed": {"group_id": "group_starch", "protein_per_100g": 2.69, "unit": "g"}
   }
@@ -47,7 +47,7 @@ Mỗi ca bắt đầu từ dữ liệu gốc. `mutation` chỉ thay đổi bản
   "rules": ["R01"],
   "actual_result": {
     "status": "PASS",
-    "run_on": "2026-10-15",
+    "run_on": "2026-10-16",
     "command": "python tests/update_case_results.py",
     "observed": {
       "status": "rejected",
@@ -77,7 +77,7 @@ Mỗi ca bắt đầu từ dữ liệu gốc. `mutation` chỉ thay đổi bản
   "rules": ["R01", "R02"],
   "actual_result": {
     "status": "PASS",
-    "run_on": "2026-10-15",
+    "run_on": "2026-10-16",
     "command": "python tests/update_case_results.py",
     "observed": {
       "dish_status": "rejected",
@@ -105,7 +105,7 @@ Mỗi ca bắt đầu từ dữ liệu gốc. `mutation` chỉ thay đổi bản
   "rules": ["R03", "R02"],
   "actual_result": {
     "status": "PASS",
-    "run_on": "2026-10-15",
+    "run_on": "2026-10-16",
     "command": "python tests/update_case_results.py",
     "observed": {
       "status": "rejected",
@@ -131,10 +131,10 @@ Mỗi ca bắt đầu từ dữ liệu gốc. `mutation` chỉ thay đổi bản
     "reason_codes": ["explicit_avoid", "diet_mismatch"],
     "preference_cannot_restore": true
   },
-  "rules": ["R03", "R04", "R02", "R09"],
+  "rules": ["R03", "R04", "R02", "R08"],
   "actual_result": {
     "status": "PASS",
-    "run_on": "2026-10-15",
+    "run_on": "2026-10-16",
     "command": "python tests/update_case_results.py",
     "observed": {
       "status": "rejected",
@@ -172,7 +172,7 @@ Mỗi ca bắt đầu từ dữ liệu gốc. `mutation` chỉ thay đổi bản
   "rules": ["R06"],
   "actual_result": {
     "status": "PASS",
-    "run_on": "2026-10-15",
+    "run_on": "2026-10-16",
     "command": "python tests/update_case_results.py",
     "observed": {
       "servings": 1,
@@ -206,14 +206,14 @@ Mỗi ca bắt đầu từ dữ liệu gốc. `mutation` chỉ thay đổi bản
       "dish_chickpea_salad": 14.514
     }
   },
-  "rules": ["R05", "R10", "R06", "R07"],
+  "rules": ["R05", "R09", "R06", "R07"],
   "actual_result": {
     "status": "PASS",
-    "run_on": "2026-10-15",
+    "run_on": "2026-10-16",
     "command": "python tests/update_case_results.py",
     "observed": {
       "order": ["dish_rice_chicken", "dish_chickpea_salad"],
-      "criteria": ["R07", "R09"],
+      "criteria": ["R07", "R08"],
       "protein_g": {"dish_rice_chicken": 37.435, "dish_chickpea_salad": 14.514},
       "decided_by": ["R07"]
     }
@@ -255,18 +255,18 @@ Mỗi ca bắt đầu từ dữ liệu gốc. `mutation` chỉ thay đổi bản
       "dish_rice_tofu": -1
     }
   },
-  "rules": ["R06", "R08", "R09", "R10"],
+  "rules": ["R06", "R07", "R08", "R09"],
   "actual_result": {
     "status": "PASS",
-    "run_on": "2026-10-15",
+    "run_on": "2026-10-16",
     "command": "python tests/update_case_results.py",
     "observed": {
       "fiber_order": ["dish_lentil_potato", "dish_chickpea_salad"],
-      "fiber_order_decided_by": ["R08"],
+      "fiber_order_decided_by": ["R07"],
       "calcium_order": ["dish_rice_tofu", "dish_chickpea_salad"],
-      "calcium_order_decided_by": ["R08"],
+      "calcium_order_decided_by": ["R07"],
       "preference_order": ["dish_rice_chicken", "dish_rice_tofu"],
-      "preference_order_decided_by": ["R09"],
+      "preference_order_decided_by": ["R08"],
       "preference_scores": {"dish_rice_chicken": 1, "dish_rice_tofu": -1}
     }
   }
@@ -306,10 +306,10 @@ Mỗi ca bắt đầu từ dữ liệu gốc. `mutation` chỉ thay đổi bản
     "statuses": ["requires_review", "requires_review", "requires_review"],
     "null_not_zero": true
   },
-  "rules": ["R05", "R02", "R06", "R10"],
+  "rules": ["R05", "R02", "R06", "R09"],
   "actual_result": {
     "status": "PASS",
-    "run_on": "2026-10-15",
+    "run_on": "2026-10-16",
     "command": "python tests/update_case_results.py",
     "observed": {
       "statuses": ["requires_review", "requires_review", "requires_review"],
@@ -353,7 +353,7 @@ Mỗi ca bắt đầu từ dữ liệu gốc. `mutation` chỉ thay đổi bản
   "rules": [],
   "actual_result": {
     "status": "PASS",
-    "run_on": "2026-10-15",
+    "run_on": "2026-10-16",
     "command": "python tests/update_case_results.py",
     "observed": {
       "mutations": [
@@ -389,10 +389,10 @@ Mỗi ca bắt đầu từ dữ liệu gốc. `mutation` chỉ thay đổi bản
     "menu_energy_ratio": 1.0264,
     "tolerance": 0.0001
   },
-  "rules": ["R11", "R12", "R06"],
+  "rules": ["R10", "R11", "R06"],
   "actual_result": {
     "status": "PASS",
-    "run_on": "2026-10-15",
+    "run_on": "2026-10-16",
     "command": "python tests/update_case_results.py",
     "observed": {
       "energy_requirement": [2800, 2000, 1800, null],
@@ -422,15 +422,15 @@ Mỗi ca bắt đầu từ dữ liệu gốc. `mutation` chỉ thay đổi bản
     "details": [["bmi_below_threshold"], [], ["bmi_unknown"]],
     "bmi_premise_contains": "19.61"
   },
-  "rules": ["R13", "R02", "R10"],
+  "rules": ["R12", "R02", "R09"],
   "actual_result": {
     "status": "PASS",
-    "run_on": "2026-10-15",
+    "run_on": "2026-10-16",
     "command": "python tests/update_case_results.py",
     "observed": {
       "statuses": ["requires_review", "eligible_in_model", "requires_review"],
       "details": [["bmi_below_threshold"], [], ["bmi_unknown"]],
-      "r13_premises": [
+      "r12_premises": [
         "58 / (172 / 100) ** 2 = 19.61",
         "null / (158 / 100) ** 2 = null",
         "user_an.nutrition_goal=lose_weight",
@@ -464,10 +464,10 @@ Mỗi ca bắt đầu từ dữ liệu gốc. `mutation` chỉ thay đổi bản
     "dish_order": ["dish_fruit_plate", "dish_lentil_potato", "dish_rice_chicken"],
     "tolerance": 0.0001
   },
-  "rules": ["R06", "R12", "R14", "R10"],
+  "rules": ["R06", "R11", "R13", "R09"],
   "actual_result": {
     "status": "PASS",
-    "run_on": "2026-10-15",
+    "run_on": "2026-10-16",
     "command": "python tests/update_case_results.py",
     "observed": {
       "energy_target": 1300,
@@ -479,7 +479,7 @@ Mỗi ca bắt đầu từ dữ liệu gốc. `mutation` chỉ thay đổi bản
         "menu_milk_free": 1334.3,
         "menu_vegan_peanut_free": 1035.0
       },
-      "menu_decided_by": ["R14", "R14", "R14", "R14"],
+      "menu_decided_by": ["R13", "R13", "R13", "R13"],
       "dish_order": ["dish_fruit_plate", "dish_lentil_potato", "dish_rice_chicken"]
     }
   }
@@ -499,19 +499,19 @@ Mỗi ca bắt đầu từ dữ liệu gốc. `mutation` chỉ thay đổi bản
   },
   "expected": {
     "order": ["menu_vegetarian", "menu_vegan_peanut_free"],
-    "decided_by": ["R15"],
+    "decided_by": ["R14"],
     "coverage": {"menu_vegetarian": "6/6", "menu_vegan_peanut_free": "5/6"},
     "vegan_coverage": {"menu_vegan_peanut_free": "5/5"},
     "vegan_excluded_groups": ["group_dairy"]
   },
-  "rules": ["R09", "R15", "R10"],
+  "rules": ["R08", "R14", "R09"],
   "actual_result": {
     "status": "PASS",
-    "run_on": "2026-10-15",
+    "run_on": "2026-10-16",
     "command": "python tests/update_case_results.py",
     "observed": {
       "order": ["menu_vegetarian", "menu_vegan_peanut_free"],
-      "decided_by": ["R15"],
+      "decided_by": ["R14"],
       "coverage": {"menu_vegan_peanut_free": "5/6", "menu_vegetarian": "6/6"},
       "vegan_coverage": {"menu_vegan_peanut_free": "5/5"},
       "vegan_excluded_groups": ["group_dairy"]

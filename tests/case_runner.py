@@ -227,7 +227,7 @@ def tc08(case):
         actual[key + "_decided_by"] = [d["rule_id"] for d in ranking["decisions"]]
         check_equal(problems, key, ranking["order"], exp[key])
         if sub["metric"] == "preference":
-            scores = {d: ranking["scores"][d]["R09"]["value"] for d in ranking["order"]}
+            scores = {d: ranking["scores"][d]["R08"]["value"] for d in ranking["order"]}
             actual["preference_scores"] = scores
             check_equal(problems, "preference_scores", scores, exp["preference_scores"])
     return actual, problems
@@ -327,12 +327,12 @@ def tc12(case):
         item = sub["menu_id"]
         statuses.append(res.status(item))
         details.append(res.details(item, "requires_review") if res.status(item) == "requires_review" else [])
-        premises.extend(p for o in res.origins(item) if o["rule_id"] == "R13" for p in o["premises"])
-    actual = {"statuses": statuses, "details": details, "r13_premises": sorted(set(premises))}
+        premises.extend(p for o in res.origins(item) if o["rule_id"] == "R12" for p in o["premises"])
+    actual = {"statuses": statuses, "details": details, "r12_premises": sorted(set(premises))}
     check_equal(problems, "statuses", statuses, exp["statuses"])
     check_equal(problems, "details", details, exp["details"])
     if not any(exp["bmi_premise_contains"] in p for p in premises):
-        problems.append(f"không thấy BMI {exp['bmi_premise_contains']} trong tiền đề R13")
+        problems.append(f"không thấy BMI {exp['bmi_premise_contains']} trong tiền đề R12")
     return actual, problems
 
 
@@ -363,10 +363,10 @@ def tc14(case):
     first, second = case["input"]["subcases"]
     eng = engine_for(base_raw())
     ranking = eng.rank(eng.infer(first["user_id"]), first["menu_ids"])
-    coverage = {m: f"{s['R15']['value']}/{s['R15']['required']}" for m, s in ranking["scores"].items()}
+    coverage = {m: f"{s['R14']['value']}/{s['R14']['required']}" for m, s in ranking["scores"].items()}
     vegan = eng.rank(eng.infer(second["user_id"]), second["menu_ids"])
-    vegan_cov = {m: f"{s['R15']['value']}/{s['R15']['required']}" for m, s in vegan["scores"].items()}
-    excluded = sorted({x["group"] for s in vegan["scores"].values() for x in s["R15"]["excluded"]})
+    vegan_cov = {m: f"{s['R14']['value']}/{s['R14']['required']}" for m, s in vegan["scores"].items()}
+    excluded = sorted({x["group"] for s in vegan["scores"].values() for x in s["R14"]["excluded"]})
     actual = {"order": ranking["order"], "decided_by": [d["rule_id"] for d in ranking["decisions"]],
               "coverage": coverage, "vegan_coverage": vegan_cov, "vegan_excluded_groups": excluded}
     problems = []
