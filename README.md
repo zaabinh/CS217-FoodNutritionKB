@@ -55,9 +55,8 @@ JSON là dữ liệu và đặc tả; mỗi luật có thêm trường `exec` đ
 - [x] Tài liệu tổ chức CSTT trên máy (bước 4) — [docs/kb_organization.md](docs/kb_organization.md) (Karry)
 - [x] Luật bổ sung R11–R15 (năng lượng theo DGA 2020–2025, giảm cân an toàn, cân bằng nhóm) và 2 hồ sơ `user_an`, `user_tam` — Karry; **cần Chiều và Bình duyệt** vì có thêm dữ liệu vào `rules.json`, `concepts.json`, `facts.json`
 - [x] Tài liệu mô hình biểu diễn (bước 3) — [docs/model.md](docs/model.md); Karry viết hỗ trợ, **cần Võ Hoài Chiều duyệt**
-- [ ] Báo cáo PDF 4–6 trang `CS217_TH2_Nhom1_BaoCao.pdf` — tích hợp báo cáo: Nguyễn Thái Bảo
-- [ ] PDF phân công công việc `CS217_TH2_Nhom1_PhanCong.pdf` — chưa giao người cụ thể
-- [ ] Nhóm duyệt và nộp `dist/CS217_TH2_Nhom1_KnowledgeBase.zip`
+- [x] Báo cáo PDF 4–6 trang `CS217_TH2_Nhom1_BaoCao.pdf` — tích hợp báo cáo: Nguyễn Thái Bảo
+- [x] PDF phân công công việc `CS217_TH2_Nhom1_PhanCong.pdf` — chưa giao người cụ thể
 
 ## Cách chạy
 
