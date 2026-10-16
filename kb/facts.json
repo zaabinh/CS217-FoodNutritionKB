@@ -280,7 +280,9 @@
       {"id": "user_lan", "name": "Hồ sơ Lan", "context": {"age": 23, "sex": "female", "activity": "low"}, "nutrition_goal": "prefer_fiber", "allergy_status": "complete", "avoid_status": "complete", "_meta": {"source_ids": ["source_synthetic"]}},
       {"id": "user_quang", "name": "Hồ sơ Quang", "context": {"age": 28, "sex": "male", "activity": "high"}, "nutrition_goal": "prefer_protein", "allergy_status": "complete", "avoid_status": "complete", "_meta": {"source_ids": ["source_synthetic"]}},
       {"id": "user_huy", "name": "Hồ sơ Huy", "context": {"age": 24, "sex": "male", "activity": "moderate"}, "nutrition_goal": "none", "allergy_status": "complete", "avoid_status": "complete", "_meta": {"source_ids": ["source_synthetic"]}},
-      {"id": "user_vy", "name": "Hồ sơ Vy", "context": {"age": 26, "sex": "female", "activity": "moderate"}, "nutrition_goal": "prefer_calcium", "allergy_status": "unknown", "avoid_status": "complete", "_meta": {"source_ids": ["source_synthetic"]}}
+      {"id": "user_vy", "name": "Hồ sơ Vy", "context": {"age": 26, "sex": "female", "activity": "moderate"}, "nutrition_goal": "prefer_calcium", "allergy_status": "unknown", "avoid_status": "complete", "_meta": {"source_ids": ["source_synthetic"]}},
+      {"id": "user_an", "name": "Hồ sơ An", "context": {"age": 35, "sex": "female", "activity": "low", "weight_kg": 72, "height_cm": 158}, "nutrition_goal": "lose_weight", "allergy_status": "complete", "avoid_status": "complete", "_meta": {"source_ids": ["source_synthetic"]}},
+      {"id": "user_tam", "name": "Hồ sơ Tâm", "context": {"age": 30, "sex": "male", "activity": "moderate", "weight_kg": 58, "height_cm": 172}, "nutrition_goal": "lose_weight", "allergy_status": "complete", "avoid_status": "complete", "_meta": {"source_ids": ["source_synthetic"]}}
     ],
     "diet_pattern": [
       {"id": "diet_ordinary", "name": "Ăn thông thường", "policy_description": "Không loại theo nguồn gốc; dị ứng và cần tránh vẫn bắt buộc xét riêng.", "policy_status": "complete", "_meta": {"source_ids": ["source_design"]}},
@@ -858,7 +860,9 @@
     {"id": "fact_0567", "relation": "prefers_food", "subject_id": "user_huy", "object_id": "food_chicken_roasted", "attributes": {"preference": "like"}, "_meta": {"source_ids": ["source_synthetic"]}},
     {"id": "fact_0568", "relation": "prefers_food", "subject_id": "user_huy", "object_id": "food_tofu_firm", "attributes": {"preference": "dislike"}, "_meta": {"source_ids": ["source_synthetic"]}},
     {"id": "fact_0569", "relation": "follows_diet", "subject_id": "user_vy", "object_id": "diet_ordinary", "attributes": {}, "_meta": {"source_ids": ["source_synthetic"]}},
-    {"id": "fact_0570", "relation": "prefers_food", "subject_id": "user_vy", "object_id": "food_milk_whole", "attributes": {"preference": "like"}, "_meta": {"source_ids": ["source_synthetic"]}}
+    {"id": "fact_0570", "relation": "prefers_food", "subject_id": "user_vy", "object_id": "food_milk_whole", "attributes": {"preference": "like"}, "_meta": {"source_ids": ["source_synthetic"]}},
+    {"id": "fact_0571", "relation": "follows_diet", "subject_id": "user_an", "object_id": "diet_ordinary", "attributes": {}, "_meta": {"source_ids": ["source_synthetic"]}},
+    {"id": "fact_0572", "relation": "follows_diet", "subject_id": "user_tam", "object_id": "diet_ordinary", "attributes": {}, "_meta": {"source_ids": ["source_synthetic"]}}
   ],
   "negative_edges": [
     {"id": "negative_fact_0001", "relation": "compatible_with_diet", "subject_id": "food_chicken_roasted", "object_id": "diet_vegetarian", "attributes": {}, "_meta": {"source_ids": ["source_vegetarian", "source_design"]}},
@@ -954,6 +958,40 @@
       "kind": "synthetic_input",
       "locator": "kb/facts.json#/entities/user_profile; tests/test_cases.md",
       "retrieved_on": "2026-10-14"
+    },
+    {
+      "id": "source_dga_energy",
+      "title": "U.S. Department of Agriculture and U.S. Department of Health and Human Services. Dietary Guidelines for Americans, 2020–2025 — Appendix 2, Table A2-2: Estimated Calorie Needs per Day, by Age, Sex, and Physical Activity Level",
+      "kind": "professional_guidance",
+      "url": "https://www.dietaryguidelines.gov/sites/default/files/2020-12/Dietary_Guidelines_for_Americans_2020-2025.pdf",
+      "locator": "Appendix 2, tr. 140–141 (PDF tr. 153–154); bảng gốc dẫn IOM, Dietary Reference Intakes for Energy (2002). Sedentary/Moderately Active/Active theo chú thích a–c của bảng. Không áp dụng cho mang thai/cho con bú (Table A2-3).",
+      "retrieved_on": "2026-10-15",
+      "release": "9th edition, December 2020",
+      "note": "Đã có ấn bản 2025–2030; TODO: cần kiểm chứng ấn bản mới có bảng tương đương hay không trước khi thay số liệu."
+    },
+    {
+      "id": "source_dga_food_groups",
+      "title": "Dietary Guidelines for Americans, 2020–2025 — Executive Summary: core elements of a healthy dietary pattern",
+      "kind": "professional_guidance",
+      "url": "https://www.dietaryguidelines.gov/sites/default/files/2020-12/Dietary_Guidelines_for_Americans_2020-2025.pdf",
+      "locator": "Executive Summary, PDF tr. 12: Vegetables, Fruits, Grains, Dairy (kể cả sữa đậu nành tăng cường), Protein foods, Oils. Khoai tây thuộc starchy vegetables và bơ quả thuộc other vegetables (PDF tr. 41); bài xếp khoai tây vào group_starch và bơ quả vào group_fruits theo thiết kế nhóm.",
+      "retrieved_on": "2026-10-15"
+    },
+    {
+      "id": "source_aha_2013",
+      "title": "Jensen MD, et al. 2013 AHA/ACC/TOS Guideline for the Management of Overweight and Obesity in Adults. Circulation. 2014;129(25 Suppl 2):S102–S138",
+      "kind": "professional_guidance",
+      "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC5819889/",
+      "locator": "Recommendation 3a: 1200–1500 kcal/d cho nữ, 1500–1800 kcal/d cho nam; hoặc thâm hụt 500 kcal/d hay 750 kcal/d. Đối tượng: người trưởng thành thừa cân/béo phì.",
+      "retrieved_on": "2026-10-15"
+    },
+    {
+      "id": "source_who_bmi",
+      "title": "WHO — Obesity and overweight (fact sheet)",
+      "kind": "professional_guidance",
+      "url": "https://www.who.int/news-room/fact-sheets/detail/obesity-and-overweight",
+      "locator": "Người trưởng thành: thừa cân khi BMI ≥ 25, béo phì khi BMI ≥ 30; BMI = cân nặng (kg) / chiều cao² (m²). Ngưỡng cho người châu Á (23) chưa áp dụng; TODO: cần kiểm chứng nếu nhóm muốn đổi.",
+      "retrieved_on": "2026-10-15"
     }
   ],
   "notes": ["Quan hệ lưu ở edges/negative_edges. Không suy phủ định từ thiếu cạnh khi trạng thái unknown.", "Dinh dưỡng USDA SR Legacy 2018: trên 100 g phần ăn được, đúng food_state; giá trị thiếu là null.", "Chỉ xét 5 tác nhân dị ứng của bài, chưa xét nhãn sản phẩm hoặc nhiễm chéo. complete chỉ áp dụng trong danh mục đã đánh giá.", "Công thức phối hợp nguyên liệu ở trạng thái đã ghi; không tự ước lượng biến đổi dinh dưỡng khi nấu.", "Hồ sơ là giả lập. Bội số, nhóm chính, công thức và xếp hạng là quyết định thiết kế của nhóm.", "Menu minh họa cấu trúc; eligible_in_model chỉ là đạt ràng buộc đã mô hình hóa, chưa chứng minh đủ nhu cầu dinh dưỡng."]
