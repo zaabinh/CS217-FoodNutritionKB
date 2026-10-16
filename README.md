@@ -1,75 +1,81 @@
 # Hệ thống tư vấn dinh dưỡng và gợi ý thực đơn
 
-## 1. Giới thiệu
+Bài thực hành 2 — Nhóm 1, môn Các hệ cơ sở tri thức (CS217.R11).
 
-Repository của **Nhóm 1**, môn **Các hệ cơ sở tri thức – CS217.R11**, phục vụ **Bài thực hành 2 (BTTH2)** với đề tài **Hệ thống tư vấn dinh dưỡng và gợi ý thực đơn**.
+## Thành viên và phân công
 
-Theo phạm vi BTTH1, hệ thống hướng đến hỗ trợ lựa chọn thực phẩm và xây dựng thực đơn dựa trên thông tin cá nhân (độ tuổi, nhu cầu dinh dưỡng, mức độ hoạt động thể chất), thực phẩm và nhóm thực phẩm, thành phần và hàm lượng dinh dưỡng, dị ứng, chế độ ăn, sở thích, mục tiêu dinh dưỡng, món ăn và bữa ăn. Các chức năng dự kiến gồm tra cứu tri thức, kiểm tra thực phẩm phù hợp, phát hiện xung đột với dị ứng/chế độ ăn, đề xuất thực phẩm và thực đơn, giải thích kết quả tư vấn.
-
-BTTH2 tập trung vào phân tích thành phần tri thức, xác định quan hệ, xây dựng mô hình biểu diễn và tổ chức cơ sở tri thức trên máy tính. **Hiện tại repository chỉ có cấu trúc và các file placeholder; chưa có dữ liệu tri thức hoặc chương trình xử lý.**
-
-## 2. Thành viên
-
-| Họ tên | MSSV | Trách nhiệm chính |
+| Thành viên | MSSV | Phần phụ trách |
 |---|---|---|
-| Đoàn Hữu Gia Bình | 24520192 | Phân tích Concepts, Attributes, Facts; chuẩn hóa tri thức thực phẩm, nhóm thực phẩm, thành phần dinh dưỡng và dữ liệu mẫu. |
-| Nguyễn Thái Bảo | 24520173 | Phân tích Relations, xác định ràng buộc, xây dựng sơ đồ tri thức tổng thể và tích hợp báo cáo. |
-| Võ Hoài Chiều | 24520220 | Thiết kế mô hình biểu diễn tri thức, Rules IF–THEN, điều kiện và kết luận suy luận. |
-| Bùi Huy Chương | 24520230 | Tổ chức cơ sở tri thức trên máy, xây dựng chương trình Python đọc/kiểm tra/truy vấn tri thức, kiểm thử và đóng gói. |
+| Đoàn Hữu Gia Bình | 24520192 | Concepts, Attributes, Facts và nguồn dữ liệu |
+| Nguyễn Thái Bảo | 24520173 | Relations, ràng buộc, sơ đồ và tích hợp báo cáo |
+| Võ Hoài Chiều | 24520220 | Mô hình biểu diễn và Rules IF–THEN |
+| Bùi Huy Chương (Karry) | 24520230 | Python nạp/kiểm tra/truy vấn, kiểm thử và đóng gói |
 
-## 3. Mô hình biểu diễn tri thức
+## Mô hình và các tệp
 
-Mô hình lựa chọn là **Concepts – Attributes – Relations – Facts – Rules**:
+Mô hình **Concepts–Attributes–Relations–Facts–Rules**: Concepts định nghĩa loại đối tượng, Attributes quy định thuộc tính, Relations định nghĩa liên kết; Facts lưu đối tượng và liên kết cụ thể, Rules suy ra kết luận từ Facts.
 
-| Thành phần | Vai trò trong mô hình dự kiến |
+| Tệp | Nội dung |
 |---|---|
-| Concepts | Định nghĩa các lớp đối tượng: thực phẩm, nhóm thực phẩm, chất dinh dưỡng, món ăn, bữa ăn, thực đơn, người dùng. |
-| Attributes | Mô tả thuộc tính và kiểu dữ liệu của từng Concept. |
-| Relations | Định nghĩa quan hệ giữa các Concepts, miền xác định, miền giá trị và ràng buộc. |
-| Facts | Biểu diễn các thực thể, giá trị thuộc tính và quan hệ cụ thể đã biết. |
-| Rules | Biểu diễn luật IF–THEN để suy ra tri thức từ các Facts. |
+| [kb/concepts.json](kb/concepts.json) | 10 Concepts, mỗi Concept có 3–6 thuộc tính, kiểu và ràng buộc |
+| [kb/relations.json](kb/relations.json) | 12 Relations: cú pháp, miền, miền giá trị, bội số, ràng buộc |
+| [kb/facts.json](kb/facts.json) | `entities`, 572 `edges` khẳng định, 11 `negative_edges` phủ định và danh mục 15 `sources` |
+| [kb/rules.json](kb/rules.json) | 15 luật IF–THEN (đặc tả + trường `exec` để thực thi), nguồn, ưu tiên và thứ tự xử lý |
+| [docs/concepts.md](docs/concepts.md) | Bảng Concepts, Attributes và cách đọc Facts |
+| [docs/relations.md](docs/relations.md) | Bảng Relations, ràng buộc và sơ đồ tổng thể |
+| [docs/rules.md](docs/rules.md) | Bảng Rules và cách giải thích kết luận |
+| [docs/model.md](docs/model.md) | Bước 3: mô tả hình thức của mô hình, ánh xạ Concepts/Relations, phân loại luật, sơ đồ, ví dụ |
+| [docs/kb_organization.md](docs/kb_organization.md) | Bước 4: tổ chức CSTT trên máy, định dạng tệp, cú pháp `exec`, cách mở rộng và chạy |
+| [src/](src) | `kb_loader.py` nạp CSTT, `validate_kb.py` kiểm tra, `engine.py` suy diễn tiến, `explain.py` giải thích, `demo_queries.py` CLI, `package_kb.py` đóng gói |
+| [tests/test_cases.md](tests/test_cases.md) | 14 ca kiểm thử: đầu vào, kỳ vọng, kết quả thực tế do chương trình ghi |
+| [tests/](tests) | 65 unit test (`test_cases_md.py`, `test_validate.py`, `test_engine.py`) |
 
-Concepts và Attributes quy định cấu trúc đối tượng; Relations quy định cách liên kết đối tượng. Facts sẽ tuân theo các định nghĩa đó, còn Rules sẽ sử dụng Facts làm tiền đề và tạo kết luận phù hợp với mô hình. Các định nghĩa và dữ kiện cụ thể sẽ được bổ sung ở giai đoạn tiếp theo.
+Dữ liệu gồm **30 thực phẩm, 6 nhóm, 6 chất dinh dưỡng, 5 tác nhân dị ứng, 12 món có định lượng, 15 bữa cụ thể thuộc 3 loại, 5 thực đơn, 7 hồ sơ giả lập và 3 chế độ ăn**. Có 180 bản ghi hàm lượng: 179 giá trị đã biết và 1 giá trị `null`.
 
-## 4. Cấu trúc repository
+Để dùng các tệp sẵn có, dữ liệu tương ứng `foods.json` và `dishes.json` trong phân công được lưu chung tại `facts.entities.food` và `facts.entities.dish`.
 
-Cây thư mục nội dung dự án (không hiển thị thư mục quản lý phiên bản `.git/`):
+## Quy ước sử dụng
 
-```text
-CS217-FoodNutritionKB/
-├── kb/
-│   ├── concepts.json
-│   ├── facts.json
-│   ├── relations.json
-│   └── rules.json
-├── docs/
-│   ├── concepts.md
-│   ├── relations.md
-│   └── rules.md
-├── src/
-│   ├── validate_kb.py
-│   └── demo_queries.py
-├── tests/
-│   └── test_cases.md
-└── README.md
+- ID tiếng Anh `snake_case`; luật dùng mã `R01`–`R15`. Liên kết dùng `subject_id` và `object_id`.
+- Dinh dưỡng theo 100 g phần ăn được, đúng `food_state`; đơn vị lấy từ Nutrient. Nguồn và ID bản ghi gốc được giữ để tra cứu.
+- Thiếu dữ liệu là `unknown`/`null`. Dị ứng, cần tránh và chế độ ăn được xét trước mục tiêu/sở thích.
+- Một nhóm chính/Food, một chế độ chính/User và ba bữa/Menu một ngày là lựa chọn thiết kế của nhóm.
+- Hồ sơ là giả lập; phạm vi dị ứng gồm 5 tác nhân trong bài. `eligible_in_model` nghĩa là đạt các điều kiện đã mô hình hóa.
+
+## Trạng thái triển khai
+
+JSON là dữ liệu và đặc tả; mỗi luật có thêm trường `exec` để bộ máy suy diễn thực thi, nên thêm luật cùng loại không cần sửa mã.
+
+- [x] Nạp 4 JSON, kiểm tra theo `concepts.attributes` và `relations` — [src/kb_loader.py](src/kb_loader.py), [src/validate_kb.py](src/validate_kb.py) (Karry)
+- [x] Triển khai luật theo `evaluation_plan`: suy diễn tiến, lặp tới điểm cố định, xếp hạng — [src/engine.py](src/engine.py) (Karry)
+- [x] Cơ chế giải thích: mã luật, Facts tiền đề, đường lan truyền — [src/explain.py](src/explain.py) (Karry)
+- [x] Truy vấn và demo với 7 hồ sơ mẫu — [src/demo_queries.py](src/demo_queries.py) (Karry)
+- [x] Kiểm thử: `actual_result` của 14 ca do chương trình ghi (14/14 PASS ngày 2026-10-15); 65 unit test đạt (Karry)
+- [x] Đóng gói ZIP kèm bằng chứng chạy thử — [src/package_kb.py](src/package_kb.py) (Karry)
+- [x] Tài liệu tổ chức CSTT trên máy (bước 4) — [docs/kb_organization.md](docs/kb_organization.md) (Karry)
+- [x] Luật bổ sung R11–R15 (năng lượng theo DGA 2020–2025, giảm cân an toàn, cân bằng nhóm) và 2 hồ sơ `user_an`, `user_tam` — Karry; **cần Chiều và Bình duyệt** vì có thêm dữ liệu vào `rules.json`, `concepts.json`, `facts.json`
+- [x] Tài liệu mô hình biểu diễn (bước 3) — [docs/model.md](docs/model.md); Karry viết hỗ trợ, **cần Võ Hoài Chiều duyệt**
+- [ ] Báo cáo PDF 4–6 trang `CS217_TH2_Nhom1_BaoCao.pdf` — tích hợp báo cáo: Nguyễn Thái Bảo
+- [ ] PDF phân công công việc `CS217_TH2_Nhom1_PhanCong.pdf` — chưa giao người cụ thể
+- [ ] Nhóm duyệt và nộp `dist/CS217_TH2_Nhom1_KnowledgeBase.zip`
+
+## Cách chạy
+
+Cần Python 3.10 trở lên; không cần cài thêm thư viện. Chạy tại thư mục gốc của repo:
+
+```bash
+python src/validate_kb.py                         # kiểm tra CSTT: 0 lỗi -> HỢP LỆ
+python src/demo_queries.py demo                   # kịch bản minh họa đầy đủ
+python src/demo_queries.py users                  # danh sách hồ sơ mẫu
+python src/demo_queries.py lookup food_rice_cooked
+python src/demo_queries.py check user_minh menu_ordinary          # trạng thái + giải thích
+python src/demo_queries.py recommend user_an --level menu         # gợi ý thực đơn có xếp hạng
+python src/demo_queries.py compare user_minh dish_rice_chicken dish_chickpea_salad
+python -m unittest discover -s tests              # 65 test (hoặc: python -m pytest tests)
+python tests/update_case_results.py               # chạy 14 ca và ghi actual_result vào tests/test_cases.md
+python src/package_kb.py                          # tạo dist/CS217_TH2_Nhom1_KnowledgeBase.zip
 ```
 
-`kb/` dành cho tri thức JSON; `docs/` dành cho tài liệu phân tích; `src/` dành cho chương trình Python; `tests/` dành cho đặc tả tình huống kiểm thử.
+Thêm `--json` vào các lệnh của `demo_queries.py` để nhận kết quả dạng JSON. Cách thêm thực phẩm, món, hồ sơ hoặc luật mới xem [docs/kb_organization.md](docs/kb_organization.md).
 
-## 5. Giải thích từng file
-
-Các chức năng trong bảng là kế hoạch triển khai. Bốn file JSON hiện chỉ chứa `{}`; các file Python và Markdown ngoài README đang để trống.
-
-| Đường dẫn | Chức năng dự kiến | Thành viên phụ trách | Trạng thái |
-|---|---|---|---|
-| `kb/concepts.json` | Lưu Concepts và Attributes: tên, thuộc tính, kiểu dữ liệu và cấu trúc biểu diễn. | Đoàn Hữu Gia Bình | Placeholder – Chưa triển khai |
-| `kb/facts.json` | Lưu thực thể và dữ kiện về thực phẩm, dinh dưỡng, người dùng, món ăn và quan hệ đã biết. | Đoàn Hữu Gia Bình; phối hợp các thành viên liên quan | Placeholder – Chưa triển khai |
-| `kb/relations.json` | Lưu Relations, miền xác định, miền giá trị và ràng buộc. | Nguyễn Thái Bảo | Placeholder – Chưa triển khai |
-| `kb/rules.json` | Lưu luật IF–THEN, điều kiện, kết luận và mức độ ưu tiên. | Võ Hoài Chiều | Placeholder – Chưa triển khai |
-| `docs/concepts.md` | Bảng phân tích khái niệm, thuộc tính và nguồn tri thức. | Đoàn Hữu Gia Bình | Placeholder – Chưa triển khai |
-| `docs/relations.md` | Bảng quan hệ, cú pháp, ý nghĩa, tính chất và ràng buộc; bổ sung sơ đồ tri thức sau. | Nguyễn Thái Bảo | Placeholder – Chưa triển khai |
-| `docs/rules.md` | Bảng đặc tả mã luật, nội dung, tiền đề, kết luận, Concepts và Relations liên quan. | Võ Hoài Chiều | Placeholder – Chưa triển khai |
-| `src/validate_kb.py` | Kiểm tra định dạng JSON, cấu trúc dữ liệu và tính nhất quán của tham chiếu. | Bùi Huy Chương | Placeholder – Chưa triển khai |
-| `src/demo_queries.py` | Nạp cơ sở tri thức, truy vấn và minh họa suy luận. | Bùi Huy Chương; phối hợp Võ Hoài Chiều | Placeholder – Chưa triển khai |
-| `tests/test_cases.md` | Đặc tả tình huống kiểm thử, đầu vào, kết quả mong đợi và kết quả thực tế. | Bùi Huy Chương | Placeholder – Chưa triển khai |
-| `README.md` | Giới thiệu repository, nhóm, mô hình, cấu trúc và phân công công việc. | Cả nhóm; Nguyễn Thái Bảo tích hợp báo cáo | Đã hoàn thiện tài liệu khởi tạo |
+> Kết quả chỉ mang tính tham khảo trong phạm vi tri thức đã mô hình hóa, không thay thế tư vấn của bác sĩ hoặc chuyên gia dinh dưỡng.

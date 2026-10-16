@@ -1,1 +1,257 @@
-{}
+{
+  "relations": [
+    {
+      "id": "rel01",
+      "name": "belongs_to_group",
+      "label_vi": "Thuộc nhóm",
+      "signature": "belongs_to_group(food, food_group)",
+      "domain": "food",
+      "range": "food_group",
+      "cardinality": {
+        "objects_per_subject": "1..1",
+        "subjects_per_object": "0..*"
+      },
+      "meaning": "Một thực phẩm thuộc đúng một nhóm phân loại chính trong bộ 6 nhóm của TH2.",
+      "edge_attributes": {},
+      "constraints": ["Mỗi food có một nhóm chính do thiết kế bài chọn; 6 nhóm được định nghĩa trong facts.entities.food_group.", "Không suy ra giàu protein từ group_protein."],
+      "source_ids": ["source_th1", "source_th2", "source_design", "source_slides"],
+      "properties": [],
+      "negative_rules": []
+    },
+    {
+      "id": "rel02",
+      "name": "has_nutrient_content",
+      "label_vi": "Có bản ghi hàm lượng",
+      "signature": "has_nutrient_content(food, nutrient_content)",
+      "domain": "food",
+      "range": "nutrient_content",
+      "cardinality": {
+        "objects_per_subject": "0..6",
+        "subjects_per_object": "1..1"
+      },
+      "meaning": "Liên kết thực phẩm với bản ghi định lượng trên 100 g phần ăn được, cùng trạng thái thực phẩm.",
+      "edge_attributes": {},
+      "constraints": ["Mỗi content có một chủ food; duy nhất (food, nutrient), tách Food khác ID khi trạng thái khác.", "Bản đủ có 6 content/food; value unknown là null, không phải 0."],
+      "source_ids": ["source_th1", "source_th2", "source_design", "source_slides"],
+      "properties": [],
+      "negative_rules": []
+    },
+    {
+      "id": "rel03",
+      "name": "measures_nutrient",
+      "label_vi": "Đo chất dinh dưỡng",
+      "signature": "measures_nutrient(nutrient_content, nutrient)",
+      "domain": "nutrient_content",
+      "range": "nutrient",
+      "cardinality": {
+        "objects_per_subject": "1..1",
+        "subjects_per_object": "0..*"
+      },
+      "meaning": "Bản ghi hàm lượng đo đúng một chất; đơn vị lấy từ Nutrient.",
+      "edge_attributes": {},
+      "constraints": ["Đơn vị lấy từ Nutrient, cơ sở 100 g phần ăn được.", "Bản known có value không âm, source_id và source_record_id; giữ trạng thái Food."],
+      "source_ids": ["source_th1", "source_th2", "source_design", "source_slides"],
+      "properties": [],
+      "negative_rules": []
+    },
+    {
+      "id": "rel04",
+      "name": "uses_ingredient",
+      "label_vi": "Dùng nguyên liệu",
+      "signature": "uses_ingredient(dish, food)",
+      "domain": "dish",
+      "range": "food",
+      "cardinality": {
+        "objects_per_subject": "1..*",
+        "subjects_per_object": "0..*"
+      },
+      "meaning": "Một công thức sử dụng thực phẩm với định lượng cho toàn bộ công thức.",
+      "edge_attributes": {
+        "amount_g": {
+          "type": "number",
+          "exclusive_minimum": 0
+        },
+        "unit": {
+          "const": "g"
+        },
+        "quantity_basis": {
+          "const": "recipe_total"
+        }
+      },
+      "constraints": ["amount_g > 0, unit = g, quantity_basis = recipe_total.", "Mỗi (dish, food) một cạnh; servings của món là số nguyên dương.", "Khối lượng phải ứng với food_state; dinh dưỡng sau chế biến cần hệ số riêng, không suy ra từ khối lượng tùy ý."],
+      "source_ids": ["source_th1", "source_th2", "source_design", "source_slides"],
+      "properties": [],
+      "negative_rules": []
+    },
+    {
+      "id": "rel05",
+      "name": "contains_allergen",
+      "label_vi": "Chứa tác nhân dị ứng",
+      "signature": "contains_allergen(food, allergen)",
+      "domain": "food",
+      "range": "allergen",
+      "cardinality": {
+        "objects_per_subject": "0..5",
+        "subjects_per_object": "0..*"
+      },
+      "meaning": "Ghi nhận tác nhân dị ứng đã xác định trong một thực phẩm.",
+      "edge_attributes": {},
+      "constraints": ["Không có cạnh không có nghĩa là không có dị ứng.", "food.allergen_status là complete/unknown; complete chỉ hoàn tất kiểm tra bộ 5 tác nhân của TH2.", "Dị ứng của dish/meal/menu được hợp từ nguyên liệu và phải giữ đường dẫn truy vết."],
+      "source_ids": ["source_th1", "source_th2", "source_design", "source_slides"],
+      "properties": [],
+      "negative_rules": [
+        {
+          "syntax": "Not(contains_allergen(food, allergen))",
+          "policy": "explicit_negative_or_scoped_complete_list",
+          "condition": "allergen_status=complete AND object thuộc danh mục đã đánh giá AND thiếu cạnh khẳng định; hoặc phủ định tường minh có nguồn. Nếu unknown và không có bằng chứng riêng: unknown.",
+          "scope": "allergen",
+          "status_attribute": "allergen_status"
+        }
+      ]
+    },
+    {
+      "id": "rel06",
+      "name": "allergic_to",
+      "label_vi": "Người dùng dị ứng",
+      "signature": "allergic_to(user_profile, allergen)",
+      "domain": "user_profile",
+      "range": "allergen",
+      "cardinality": {
+        "objects_per_subject": "0..5",
+        "subjects_per_object": "0..*"
+      },
+      "meaning": "Người dùng khai báo dị ứng với tác nhân trong danh mục.",
+      "edge_attributes": {},
+      "constraints": ["Là sự kiện đầu vào, không phải kiến thức chuyên môn.", "allergy_status = complete mới diễn giải tập rỗng là không khai báo dị ứng trong phạm vi bài.", "allergy_status = unknown khiến kết quả kiểm tra chưa xác định."],
+      "source_ids": ["source_th1", "source_th2", "source_design", "source_slides"],
+      "properties": [],
+      "negative_rules": []
+    },
+    {
+      "id": "rel07",
+      "name": "follows_diet",
+      "label_vi": "Theo chế độ ăn",
+      "signature": "follows_diet(user_profile, diet_pattern)",
+      "domain": "user_profile",
+      "range": "diet_pattern",
+      "cardinality": {
+        "objects_per_subject": "1..1",
+        "subjects_per_object": "0..*"
+      },
+      "meaning": "Mỗi hồ sơ có đúng một chế độ ăn chính.",
+      "edge_attributes": {},
+      "constraints": ["Mỗi profile chọn đúng một diet_pattern chính trong bộ 3; đây là thiết kế của bài.", "diet_vegetarian là lacto-ovo; diet_vegan loại toàn bộ nguồn gốc động vật."],
+      "source_ids": ["source_th1", "source_th2", "source_design", "source_slides"],
+      "properties": [],
+      "negative_rules": []
+    },
+    {
+      "id": "rel08",
+      "name": "compatible_with_diet",
+      "label_vi": "Phù hợp chế độ ăn",
+      "signature": "compatible_with_diet(food, diet_pattern)",
+      "domain": "food",
+      "range": "diet_pattern",
+      "cardinality": {
+        "objects_per_subject": "0..3",
+        "subjects_per_object": "0..*"
+      },
+      "meaning": "Cạnh khẳng định một thực phẩm được cho phép theo định nghĩa chế độ ăn đã chốt.",
+      "edge_attributes": {},
+      "constraints": ["food.diet_status = complete khi đã đánh giá cả 3 chế độ; khi đó thiếu cạnh là không phù hợp.", "Nếu diet_status = unknown, thiếu cạnh là chưa biết; không tự cho phép.", "Món phù hợp chỉ khi mọi nguyên liệu phù hợp; thiếu thông tin của một nguyên liệu thì chưa kết luận."],
+      "source_ids": ["source_th1", "source_th2", "source_design", "source_slides"],
+      "properties": [],
+      "negative_rules": [
+        {
+          "syntax": "Not(compatible_with_diet(food, diet_pattern))",
+          "policy": "explicit_negative_or_scoped_complete_list",
+          "condition": "diet_status=complete AND object thuộc danh mục đã đánh giá AND thiếu cạnh khẳng định; hoặc phủ định tường minh có nguồn. Nếu unknown và không có bằng chứng riêng: unknown.",
+          "scope": "diet_pattern",
+          "status_attribute": "diet_status"
+        }
+      ]
+    },
+    {
+      "id": "rel09",
+      "name": "contains_dish",
+      "label_vi": "Bữa ăn gồm món",
+      "signature": "contains_dish(meal, dish)",
+      "domain": "meal",
+      "range": "dish",
+      "cardinality": {
+        "objects_per_subject": "1..*",
+        "subjects_per_object": "0..*"
+      },
+      "meaning": "Bữa ăn cụ thể chứa món với số khẩu phần được dùng.",
+      "edge_attributes": {
+        "servings": {
+          "type": "number",
+          "exclusive_minimum": 0
+        }
+      },
+      "constraints": ["servings > 0; không trùng (meal, dish).", "Mỗi meal có meal_type = breakfast/lunch/dinner; cùng loại bữa có thể có nhiều instance."],
+      "source_ids": ["source_th1", "source_th2", "source_design", "source_slides"],
+      "properties": [],
+      "negative_rules": []
+    },
+    {
+      "id": "rel10",
+      "name": "contains_meal",
+      "label_vi": "Thực đơn gồm bữa",
+      "signature": "contains_meal(menu, meal)",
+      "domain": "menu",
+      "range": "meal",
+      "cardinality": {
+        "objects_per_subject": "3..3",
+        "subjects_per_object": "0..*"
+      },
+      "meaning": "Thực đơn một ngày chứa đúng ba bữa sáng, trưa, tối.",
+      "edge_attributes": {},
+      "constraints": ["Bộ mẫu chọn scope=one_day, đúng một breakfast/lunch/dinner; đây là quyết định thiết kế, không phải suy từ việc đề bài có 3 loại bữa.", "Meal ID là instance, có thể tái sử dụng trong nhiều Menu."],
+      "source_ids": ["source_th1", "source_th2", "source_design", "source_slides"],
+      "properties": [],
+      "negative_rules": []
+    },
+    {
+      "id": "rel11",
+      "name": "avoids_food",
+      "label_vi": "Cần tránh thực phẩm",
+      "signature": "avoids_food(user_profile, food)",
+      "domain": "user_profile",
+      "range": "food",
+      "cardinality": {
+        "objects_per_subject": "0..*",
+        "subjects_per_object": "0..*"
+      },
+      "meaning": "Danh sách thực phẩm người dùng bắt buộc tránh.",
+      "edge_attributes": {},
+      "constraints": ["Ràng buộc cứng: loại cả món chứa thực phẩm cần tránh.", "avoid_status = unknown không được xem như danh sách rỗng đã xác nhận.", "Nếu đồng thời prefers_food = like, ràng buộc tránh thắng và ghi nhận xung đột."],
+      "source_ids": ["source_th1", "source_th2", "source_design", "source_slides"],
+      "properties": [],
+      "negative_rules": []
+    },
+    {
+      "id": "rel12",
+      "name": "prefers_food",
+      "label_vi": "Sở thích thực phẩm",
+      "signature": "prefers_food(user_profile, food)",
+      "domain": "user_profile",
+      "range": "food",
+      "cardinality": {
+        "objects_per_subject": "0..*",
+        "subjects_per_object": "0..*"
+      },
+      "meaning": "Biểu diễn thích hoặc không thích thực phẩm để xếp hạng ứng viên.",
+      "edge_attributes": {
+        "preference": {
+          "type": "enum",
+          "values": ["like", "dislike"]
+        }
+      },
+      "constraints": ["preference thuộc {like, dislike}; một (user, food) chỉ có một giá trị.", "Thiếu cạnh = không khai báo sở thích; đây là ưu tiên mềm.", "Chỉ xét sở thích sau khi vượt qua kiểm tra dị ứng, tránh và chế độ ăn."],
+      "source_ids": ["source_th1", "source_th2", "source_design", "source_slides"],
+      "properties": [],
+      "negative_rules": []
+    }
+  ]
+}
